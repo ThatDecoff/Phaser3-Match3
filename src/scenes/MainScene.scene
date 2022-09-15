@@ -1,0 +1,162 @@
+{
+    "id": "0b3ad97e-143d-4d65-9f3b-303a1d9296c0",
+    "sceneType": "SCENE",
+    "settings": {
+        "preloadPackFiles": [],
+        "createMethodName": "editorCreate",
+        "sceneKey": "MainScene",
+        "compilerOutputLanguage": "TYPE_SCRIPT",
+        "borderWidth": 375,
+        "borderHeight": 587
+    },
+    "displayList": [
+        {
+            "type": "Container",
+            "id": "d1c6278d-5591-443f-b028-6cd65dbe1a6d",
+            "label": "PowerUpContainer",
+            "useGameObjectName": true,
+            "components": [],
+            "list": [
+                {
+                    "type": "Image",
+                    "id": "d43a71b2-24ae-4042-be55-6281e765d390",
+                    "label": "hint_booster",
+                    "useGameObjectName": true,
+                    "components": [],
+                    "texture": {
+                        "key": "RAINBOW"
+                    },
+                    "x": 115,
+                    "y": 540,
+                    "scaleX": 0.4,
+                    "scaleY": 0.4
+                },
+                {
+                    "type": "Image",
+                    "id": "36b9d759-a7a6-45a7-863f-8fb5b3519d0b",
+                    "label": "shuffle_booster",
+                    "useGameObjectName": true,
+                    "components": [],
+                    "texture": {
+                        "key": "SHUFFLE"
+                    },
+                    "x": 270,
+                    "y": 540,
+                    "scaleX": 0.4,
+                    "scaleY": 0.4
+                }
+            ]
+        },
+        {
+            "type": "Container",
+            "id": "cddcf1ba-3f9b-40af-843b-1a68c5dd3d73",
+            "label": "HealthBarContainer",
+            "useGameObjectName": true,
+            "components": [],
+            "x": 192,
+            "y": 64,
+            "list": [
+                {
+                    "type": "Image",
+                    "id": "43b07950-76d4-4112-a2c8-c99908af4ccf",
+                    "label": "hpbar_bg",
+                    "useGameObjectName": true,
+                    "components": [],
+                    "texture": {
+                        "key": "hpbar_bg"
+                    },
+                    "scaleX": 4,
+                    "scaleY": 4
+                },
+                {
+                    "type": "Image",
+                    "id": "4d8b3dd6-40f7-457e-b05d-a197713a8499",
+                    "label": "hpbar_fill_white",
+                    "useGameObjectName": true,
+                    "components": [],
+                    "texture": {
+                        "key": "hpbar_fill_white"
+                    },
+                    "scaleX": 4,
+                    "scaleY": 4
+                },
+                {
+                    "type": "Image",
+                    "id": "ff070a88-6b1f-4dd7-b042-780fa069fdde",
+                    "label": "hpbar_fill",
+                    "useGameObjectName": true,
+                    "components": [],
+                    "texture": {
+                        "key": "hpbar_fill"
+                    },
+                    "x": -150,
+                    "scaleX": 4,
+                    "scaleY": 4,
+                    "originX": 0
+                },
+                {
+                    "type": "Image",
+                    "id": "1df9c10e-96ba-41e8-b750-6857b0d1ece0",
+                    "label": "hpbar_frame",
+                    "useGameObjectName": true,
+                    "components": [],
+                    "texture": {
+                        "key": "hpbar_frame"
+                    },
+                    "scaleX": 4,
+                    "scaleY": 4
+                },
+                {
+                    "type": "Text",
+                    "id": "36ad8577-9300-499e-a0c1-9aeac8d48d49",
+                    "label": "level_text",
+                    "useGameObjectName": true,
+                    "components": [],
+                    "y": -40,
+                    "originX": 0.5,
+                    "originY": 0.5,
+                    "text": "Level XX",
+                    "align": "center",
+                    "fontSize": "24px",
+                    "fontStyle": "bold"
+                },
+                {
+                    "type": "Text",
+                    "id": "fc1ae735-d4af-4a1a-bee3-cd2042d46071",
+                    "label": "hpbar_text",
+                    "useGameObjectName": true,
+                    "components": [],
+                    "originX": 0.5,
+                    "originY": 0.5,
+                    "text": "XX / XX",
+                    "align": "center",
+                    "fontSize": "18px",
+                    "fontStyle": "bold",
+                    "color": "#000000ff"
+                }
+            ]
+        },
+        {
+            "type": "Image",
+            "id": "b67017e8-5e02-4c88-b64c-cef7d40613b2",
+            "label": "GameManager",
+            "useGameObjectName": true,
+            "components": [
+                "TestComponent",
+                "TileCreator",
+                "TileSelector",
+                "ScoreSystem",
+                "PlayerInput"
+            ],
+            "texture": {},
+            "visible": false
+        }
+    ],
+    "plainObjects": [],
+    "meta": {
+        "app": "Phaser Editor 2D - Scene Editor",
+        "url": "https://phasereditor2d.com",
+        "contentType": "phasereditor2d.core.scene.SceneContentType",
+        "version": 3
+    }
+}

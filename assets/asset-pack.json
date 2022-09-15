@@ -1,0 +1,144 @@
+{
+    "section1": {
+        "files": [
+            {
+                "url": "assets/tiles/BLUE_1.png",
+                "type": "image",
+                "key": "BLUE_1"
+            },
+            {
+                "url": "assets/tiles/BLUE_2.png",
+                "type": "image",
+                "key": "BLUE_2"
+            },
+            {
+                "url": "assets/dino.png",
+                "type": "image",
+                "key": "dino"
+            },
+            {
+                "url": "assets/tiles/GREEN_1.png",
+                "type": "image",
+                "key": "GREEN_1"
+            },
+            {
+                "url": "assets/tiles/GREEN_2.png",
+                "type": "image",
+                "key": "GREEN_2"
+            },
+            {
+                "url": "assets/hpbar/hpbar_bg.png",
+                "type": "image",
+                "key": "hpbar_bg"
+            },
+            {
+                "url": "assets/hpbar/hpbar_fill.png",
+                "type": "image",
+                "key": "hpbar_fill"
+            },
+            {
+                "url": "assets/hpbar/hpbar_fill_white.png",
+                "type": "image",
+                "key": "hpbar_fill_white"
+            },
+            {
+                "url": "assets/hpbar/hpbar_frame.png",
+                "type": "image",
+                "key": "hpbar_frame"
+            },
+            {
+                "url": "assets/tiles/PURPLE_1.png",
+                "type": "image",
+                "key": "PURPLE_1"
+            },
+            {
+                "url": "assets/tiles/PURPLE_2.png",
+                "type": "image",
+                "key": "PURPLE_2"
+            },
+            {
+                "url": "assets/booster/RAINBOW.png",
+                "type": "image",
+                "key": "RAINBOW"
+            },
+            {
+                "url": "assets/booster/RAINBOW_off.png",
+                "type": "image",
+                "key": "RAINBOW_off"
+            },
+            {
+                "url": "assets/booster/RAINBOW_on.png",
+                "type": "image",
+                "key": "RAINBOW_on"
+            },
+            {
+                "url": "assets/tiles/RED_1.png",
+                "type": "image",
+                "key": "RED_1"
+            },
+            {
+                "url": "assets/tiles/RED_2.png",
+                "type": "image",
+                "key": "RED_2"
+            },
+            {
+                "url": "assets/booster/SHUFFLE.png",
+                "type": "image",
+                "key": "SHUFFLE"
+            },
+            {
+                "url": "assets/booster/SHUFFLE_off.png",
+                "type": "image",
+                "key": "SHUFFLE_off"
+            },
+            {
+                "url": "assets/booster/SHUFFLE_on.png",
+                "type": "image",
+                "key": "SHUFFLE_on"
+            },
+            {
+                "url": "assets/tiles_fx/tiles_fx.png",
+                "frameConfig": {
+                    "frameWidth": 32,
+                    "frameHeight": 32,
+                    "startFrame": 0,
+                    "endFrame": -1,
+                    "spacing": 0,
+                    "margin": 0
+                },
+                "type": "spritesheet",
+                "key": "tiles_fx"
+            },
+            {
+                "url": "assets/tiles_select/tiles_select.png",
+                "frameConfig": {
+                    "frameWidth": 32,
+                    "frameHeight": 32,
+                    "startFrame": 0,
+                    "endFrame": -1,
+                    "spacing": 0,
+                    "margin": 0
+                },
+                "type": "spritesheet",
+                "key": "tiles_select"
+            },
+            {
+                "url": "assets/tiles/YELLOW_1.png",
+                "type": "image",
+                "key": "YELLOW_1"
+            },
+            {
+                "url": "assets/tiles/YELLOW_2.png",
+                "type": "image",
+                "key": "YELLOW_2"
+            }
+        ]
+    },
+    "meta": {
+        "app": "Phaser Editor 2D - Asset Pack Editor",
+        "contentType": "phasereditor2d.pack.core.AssetContentType",
+        "url": "https://phasereditor2d.com",
+        "version": 2,
+        "showAllFilesInBlocks": false
+    }
+}
