@@ -39,7 +39,7 @@ class TileSelector extends UserComponent {
 	private scoreText: Phaser.GameObjects.Text;
 
 	private tileCreator?: TileCreator;
-	private scoreSystem?: ScoreSystem;
+	private levelSystem?: LevelSystem;
 
 	private connectors: TileConnector[] = [];
 	private tileList: Tiles[] = [];
@@ -127,7 +127,7 @@ class TileSelector extends UserComponent {
 	}
 
 	public ValidateSelection(){
-		if(!this.tileCreator || !this.scoreSystem){
+		if(!this.tileCreator || !this.levelSystem){
 			return;
 		}
 
@@ -142,7 +142,7 @@ class TileSelector extends UserComponent {
 			var tileLength = this.tileList.length;
 			this.DeselectAllTile();
 			var tileCounter = this.tileCreator.ConsumeTile(tileCoords);
-			this.scoreSystem.IncrementHealth(-TileSelector.ScoreFunction(tileLength));
+			this.levelSystem.IncrementHealth(-TileSelector.ScoreFunction(tileLength));
 		}
 		else{
 			console.log("Validate: False");
@@ -187,8 +187,8 @@ class TileSelector extends UserComponent {
 		this.tileCreator = tileCreator;
 	}
 
-	public SetScoreSystem(scoreSystem: ScoreSystem){
-		this.scoreSystem = scoreSystem;
+	public SetLevelSystem(levelSystem: LevelSystem){
+		this.levelSystem = levelSystem;
 	}
 
 	/* END-USER-CODE */

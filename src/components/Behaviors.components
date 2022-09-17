@@ -31,8 +31,26 @@
             "properties": []
         },
         {
-            "name": "ScoreSystem",
+            "name": "LevelSystem",
             "baseClass": "UserComponent",
+            "gameObjectType": "Phaser.GameObjects.Image",
+            "properties": []
+        },
+        {
+            "name": "BoosterBase",
+            "baseClass": "UserComponent",
+            "gameObjectType": "Phaser.GameObjects.Image",
+            "properties": []
+        },
+        {
+            "name": "HintBooster",
+            "baseClass": "BoosterBase",
+            "gameObjectType": "Phaser.GameObjects.Image",
+            "properties": []
+        },
+        {
+            "name": "ShuffleBooster",
+            "baseClass": "BoosterBase",
             "gameObjectType": "Phaser.GameObjects.Image",
             "properties": []
         }

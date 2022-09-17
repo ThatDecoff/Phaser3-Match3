@@ -22,7 +22,9 @@
                     "id": "d43a71b2-24ae-4042-be55-6281e765d390",
                     "label": "hint_booster",
                     "useGameObjectName": true,
-                    "components": [],
+                    "components": [
+                        "HintBooster"
+                    ],
                     "texture": {
                         "key": "RAINBOW"
                     },
@@ -36,7 +38,9 @@
                     "id": "36b9d759-a7a6-45a7-863f-8fb5b3519d0b",
                     "label": "shuffle_booster",
                     "useGameObjectName": true,
-                    "components": [],
+                    "components": [
+                        "ShuffleBooster"
+                    ],
                     "texture": {
                         "key": "SHUFFLE"
                     },
@@ -146,6 +150,7 @@
                 "TileCreator",
                 "TileSelector",
                 "ScoreSystem",
+                "LevelSystem",
                 "PlayerInput"
             ],
             "texture": {},

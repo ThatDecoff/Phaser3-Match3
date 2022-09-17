@@ -87,14 +87,21 @@ class MainScene extends Phaser.Scene {
 		gameManager.name = "GameManager";
 		gameManager.visible = false;
 
+		// hint_booster (components)
+		new HintBooster(hint_booster);
+
+		// shuffle_booster (components)
+		new ShuffleBooster(shuffle_booster);
+
 		// gameManager (components)
 		new TileCreator(gameManager);
 		new TileSelector(gameManager);
-		new ScoreSystem(gameManager);
+		new LevelSystem(gameManager);
 		new PlayerInput(gameManager);
 
 		this.GameManagerSetup(gameManager);
-		this.ScoreSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
+		this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
+		this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
 		this.InputSetup(gameManager);
 		this.PrintAll();
 		this.events.emit("scene-awake");
@@ -103,7 +110,8 @@ class MainScene extends Phaser.Scene {
 	/* START-USER-CODE */
 
 		// this.GameManagerSetup(gameManager);
-		// this.ScoreSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
+		// this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
+		// this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
 		// this.InputSetup(gameManager);
 		// this.PrintAll();
 
@@ -113,28 +121,46 @@ class MainScene extends Phaser.Scene {
 		var tileCreator = TileCreator.getComponent(gameManager);
 		var tileSelector = TileSelector.getComponent(gameManager);
 		var playerInput = PlayerInput.getComponent(gameManager);
-		var scoreSystem = ScoreSystem.getComponent(gameManager);
+		var levelSystem = LevelSystem.getComponent(gameManager);
 
 		//console.log("Game Manager Setup " + tileCreator + " " + tileSelector + " " + playerInput);
 
 		tileSelector.SetTileCreator(tileCreator);
-		tileSelector.SetScoreSystem(scoreSystem);
+		tileSelector.SetLevelSystem(levelSystem);
 
 		playerInput.SetTileCreator(tileCreator);
 		playerInput.SetTileSelector(tileSelector);
 	}
 
-	private ScoreSystemSetup(
+	private LevelSystemSetup(
 		gameManager: Phaser.GameObjects.Image,
 		hpBarText: Phaser.GameObjects.Text,
 		levelText: Phaser.GameObjects.Text,
 		hpBarImage: Phaser.GameObjects.Image
 	){
-		var scoreSystem = ScoreSystem.getComponent(gameManager);
+		var levelSystem = LevelSystem.getComponent(gameManager);
 
-		scoreSystem.SetHpBarText(hpBarText);
-		scoreSystem.SetLevelText(levelText);
-		scoreSystem.SetHpBarImage(hpBarImage);
+		levelSystem.SetHpBarText(hpBarText);
+		levelSystem.SetLevelText(levelText);
+		levelSystem.SetHpBarImage(hpBarImage);
+	}
+
+	private BoosterSetup(
+		gameManager: Phaser.GameObjects.Image,
+		hintBooster: Phaser.GameObjects.Image,
+		shuffleBooster: Phaser.GameObjects.Image
+	){
+		var tileCreator = TileCreator.getComponent(gameManager);
+		var tileSelector = TileSelector.getComponent(gameManager);
+
+		var hintBoosterScr = HintBooster.getComponent(hintBooster);
+		var shuffleBoosterScr = ShuffleBooster.getComponent(shuffleBooster);
+
+		hintBoosterScr.SetTileCreator(tileCreator);
+		hintBoosterScr.SetTileSelector(tileSelector);
+
+		shuffleBoosterScr.SetTileCreator(tileCreator);
+		shuffleBoosterScr.SetTileSelector(tileSelector);
 	}
 
 	private InputSetup(gameManager: Phaser.GameObjects.Image){

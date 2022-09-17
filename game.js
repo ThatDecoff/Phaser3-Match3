@@ -59,13 +59,312 @@ class UserComponent {
     start() {
         // override this
     }
-    update() {
+    update(time, delta) {
         // override this
     }
     destroy() {
         // override this
     }
 }
+/// <reference path="./UserComponent.ts"/>
+// You can write more code here
+/* START OF COMPILED CODE */
+/* START-USER-IMPORTS */
+/* END-USER-IMPORTS */
+class BoosterBase extends UserComponent {
+    constructor(gameObject) {
+        super(gameObject);
+        this.gameObject = gameObject;
+        gameObject["__BoosterBase"] = this;
+        /* START-USER-CTR-CODE */
+        this.SetInteractive();
+        /* END-USER-CTR-CODE */
+    }
+    static getComponent(gameObject) {
+        return gameObject["__BoosterBase"];
+    }
+    gameObject;
+    /* START-USER-CODE */
+    SetInteractive() {
+        var shape = new Phaser.Geom.Circle(75, 60, 37.5);
+        this.gameObject.setInteractive(shape, Phaser.Geom.Circle.Contains);
+        // var graphics = this.scene.add.graphics({ x: this.gameObject.x - this.gameObject.displayOriginX, y: this.gameObject.y - this.gameObject.displayOriginY });
+        // graphics.lineStyle(2, 0x00aa00);
+        // graphics.strokeCircle(75, 60, 37.5);
+    }
+    OnStandby(message) {
+        // Override
+        //console.log("BoosterBase: Standby");
+    }
+    OnInteract(message) {
+        // Override
+        //console.log("BoosterBase: Interact");
+    }
+    OnCancel(message) {
+        // Override
+        //console.log("BoosterBase: Cancel");
+    }
+    static shuffle(array) {
+        var currentIndex = array.length;
+        while (currentIndex > 0) {
+            var randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [
+                array[randomIndex], array[currentIndex]
+            ];
+        }
+        return array;
+    }
+}
+/* END OF COMPILED CODE */
+// You can write more code here
+// You can write more code here
+/* START OF COMPILED CODE */
+/* START-USER-IMPORTS */
+/* END-USER-IMPORTS */
+class Component {
+    constructor(gameObject) {
+        this.gameObject = gameObject;
+        gameObject["__Component"] = this;
+        /* START-USER-CTR-CODE */
+        // Write your code here.
+        /* END-USER-CTR-CODE */
+    }
+    static getComponent(gameObject) {
+        return gameObject["__Component"];
+    }
+    gameObject;
+}
+/* END OF COMPILED CODE */
+// You can write more code here
+/// <reference path="./BoosterBase.ts"/>
+// You can write more code here
+/* START OF COMPILED CODE */
+/* START-USER-IMPORTS */
+/* END-USER-IMPORTS */
+class HintBooster extends BoosterBase {
+    constructor(gameObject) {
+        super(gameObject);
+        this.gameObject = gameObject;
+        gameObject["__HintBooster"] = this;
+        /* START-USER-CTR-CODE */
+        // Write your code here.
+        /* END-USER-CTR-CODE */
+    }
+    static getComponent(gameObject) {
+        return gameObject["__HintBooster"];
+    }
+    // private gameObject: Phaser.GameObjects.Image;
+    /* START-USER-CODE */
+    static IdleTexture = "RAINBOW";
+    static StandbyTexture = "RAINBOW_on";
+    static DisableTexture = "RAINBOW_off";
+    tileCreator;
+    tileSelector;
+    standby = false;
+    cooldown = 0;
+    update(time, delta) {
+        if (this.cooldown > 0) {
+            delta = delta / 1000;
+            this.cooldown -= delta;
+            // console.log(this.cooldown + " " + delta);
+        }
+        if (this.cooldown <= 0) {
+            this.UpdateTexture();
+        }
+    }
+    OnStandby(message) {
+        if (this.cooldown > 0) {
+            return;
+        }
+        console.log("HintBooster: Standby");
+        this.SetStandby(true);
+    }
+    OnInteract(message) {
+        if (this.cooldown > 0) {
+            return;
+        }
+        console.log("HintBooster: Interact");
+        this.SetStandby(false);
+        this.SetCooldown(5);
+        if (!this.tileCreator || !this.tileSelector) {
+            return;
+        }
+        var boardSize = this.tileCreator.GetBoardSize();
+        var visitedList = [];
+        var randomTileList = [];
+        for (var i = 0; i < boardSize.x; i++) {
+            visitedList.push([]);
+            for (var j = 0; j < boardSize.y; j++) {
+                randomTileList.push({ x: i, y: j });
+                visitedList[i].push(false);
+            }
+        }
+        randomTileList = BoosterBase.shuffle(randomTileList);
+        // Random start vertex for search
+        var result = [];
+        var endSearch = false;
+        while (randomTileList.length > 0) {
+            result = [];
+            var color = -1;
+            var stack = [];
+            var startTile = randomTileList.pop();
+            if (startTile) {
+                stack.push(startTile);
+            }
+            // Random DFS
+            while (stack.length > 0) {
+                var vertex = stack.pop();
+                if (!vertex) {
+                    break;
+                }
+                visitedList[vertex.x][vertex.y] = true;
+                result.push(vertex);
+                color = this.tileCreator.GetTileImage(vertex);
+                endSearch = true;
+                var neighbors = this.tileCreator.GetTileNeighbors(vertex);
+                neighbors = BoosterBase.shuffle(neighbors);
+                for (var i = 0; i < neighbors.length; i++) {
+                    var neighbor = neighbors[i];
+                    var neighborColor = this.tileCreator.GetTileImage(neighbor);
+                    if (!visitedList[neighbor.x][neighbor.y] && neighborColor == color) {
+                        stack.push(neighbor);
+                        endSearch = false;
+                    }
+                }
+                // Check for length, if satisfied done
+                if (endSearch) {
+                    if (result.length >= 3) {
+                        break;
+                    }
+                    else {
+                        var tile = result.pop();
+                        if (tile) {
+                            visitedList[tile.x][tile.y] = false;
+                        }
+                        endSearch = false;
+                    }
+                }
+            }
+            if (endSearch) {
+                break;
+            }
+        }
+        // Search result query
+        console.log("Hint Booster, Array Length = " + result.length);
+        for (var i = 0; i < result.length; i++) {
+            console.log("Result: " + i + " " + result[i].x + ";" + result[i].y + " C: " + this.tileCreator.GetTileImage(result[i]));
+        }
+        if (result.length >= 3) {
+            for (var i = 0; i < result.length; i++) {
+                var resTileScript = this.tileCreator.GetTileScript(result[i]);
+                if (resTileScript) {
+                    this.tileSelector.SelectTile(resTileScript);
+                }
+            }
+            this.tileSelector.ValidateSelection();
+        }
+    }
+    OnCancel(message) {
+        console.log("HintBooster: Cancel");
+        this.SetStandby(false);
+    }
+    SetCooldown(value) {
+        this.cooldown = value;
+        this.UpdateTexture();
+    }
+    SetStandby(value) {
+        this.standby = value;
+        this.UpdateTexture();
+    }
+    UpdateTexture() {
+        if (this.cooldown > 0) {
+            this.gameObject.setTexture(HintBooster.DisableTexture);
+        }
+        else if (this.standby) {
+            this.gameObject.setTexture(HintBooster.StandbyTexture);
+        }
+        else {
+            this.gameObject.setTexture(HintBooster.IdleTexture);
+        }
+    }
+    SetTileCreator(tileCreator) {
+        this.tileCreator = tileCreator;
+        //console.log("Set Tile Creator " + this.tileCreator + " " + this.tileSelector);
+    }
+    SetTileSelector(tileSelector) {
+        this.tileSelector = tileSelector;
+        //console.log("Set Tile Selector " + this.tileCreator + " " + this.tileSelector);
+    }
+}
+/* END OF COMPILED CODE */
+// You can write more code here
+/// <reference path="./UserComponent.ts"/>
+// You can write more code here
+/* START OF COMPILED CODE */
+/* START-USER-IMPORTS */
+/* END-USER-IMPORTS */
+class LevelSystem extends UserComponent {
+    constructor(gameObject) {
+        super(gameObject);
+        this.gameObject = gameObject;
+        gameObject["__LevelSystem"] = this;
+        /* START-USER-CTR-CODE */
+        this.CheckLevelUp();
+        /* END-USER-CTR-CODE */
+    }
+    static getComponent(gameObject) {
+        return gameObject["__LevelSystem"];
+    }
+    gameObject;
+    /* START-USER-CODE */
+    hpBarText;
+    levelText;
+    hpBarImage;
+    barInitScale = 0;
+    maxHp = 0;
+    currentHp = 0;
+    currentLevel = 0;
+    static LevelFunction = function (value) {
+        return 10 * Math.pow(2, value) + 20 * Math.pow(2, Math.max(0, value - 4));
+    };
+    SetHpBarText(hpBarText) {
+        this.hpBarText = hpBarText;
+        this.CheckLevelUp();
+    }
+    SetLevelText(levelText) {
+        this.levelText = levelText;
+        this.CheckLevelUp();
+    }
+    SetHpBarImage(hpBarImage) {
+        this.hpBarImage = hpBarImage;
+        this.barInitScale = hpBarImage.scaleX;
+        this.CheckLevelUp();
+    }
+    IncrementHealth(value, relative = true) {
+        this.currentHp = Math.max(0, this.currentHp + value);
+        this.CheckLevelUp();
+        this.UpdateTexts();
+    }
+    CheckLevelUp() {
+        if (this.currentHp <= 0) {
+            this.currentLevel += 1;
+            this.maxHp = LevelSystem.LevelFunction(this.currentLevel);
+            this.currentHp = this.maxHp;
+        }
+        this.UpdateTexts();
+    }
+    UpdateTexts() {
+        if (!this.hpBarText || !this.hpBarImage || !this.levelText) {
+            return;
+        }
+        this.hpBarText.setText(this.currentHp + " / " + this.maxHp);
+        this.levelText.setText("Level " + this.currentLevel);
+        this.hpBarImage.scaleX = (this.currentHp / this.maxHp) * this.barInitScale;
+    }
+}
+/* END OF COMPILED CODE */
+// You can write more code here
 /// <reference path="./UserComponent.ts"/>
 // You can write more code here
 /* START OF COMPILED CODE */
@@ -90,9 +389,12 @@ class PlayerInput extends UserComponent {
     static Instance;
     tileCreator;
     tileSelector;
-    Interaction = false;
+    interactable = true;
+    tileInteraction = false;
+    boosterInteraction = false;
+    boosterObject;
     start() {
-        this.PrepareInteractionBox();
+        // this.PrepareInteractionBox();
     }
     PrepareInteractionBox() {
         //console.log("Prepare Interaction " + this.tileCreator + " " + this.tileSelector);
@@ -129,12 +431,22 @@ class PlayerInput extends UserComponent {
         if (!this.tileCreator || !this.tileSelector) {
             return;
         }
+        // console.log("Pointer Down " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
         //console.log("Pointer Down Pass");
-        if (!this.Interaction && Tiles.getComponent(gameObject)) {
-            //console.log("Pointer Down Pass");
-            this.Interaction = true;
+        if (this.interactable && Tiles.getComponent(gameObject)) {
+            // console.log("Pointer Down: Tile");
+            this.interactable = false;
+            this.tileInteraction = true;
             this.tileSelector.SelectTile(Tiles.getComponent(gameObject));
         }
+        else if (this.interactable && BoosterBase.getComponent(gameObject)) {
+            // console.log("Pointer Down: Booster");
+            this.interactable = false;
+            this.boosterInteraction = true;
+            this.boosterObject = BoosterBase.getComponent(gameObject);
+            this.boosterObject.OnStandby();
+        }
+        // console.log("Pointer Down RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
     }
     OnPointerOver(pointer, gameObject) {
         //console.log("Pointer Over " + this.tileCreator + " " + this.tileSelector);
@@ -142,8 +454,10 @@ class PlayerInput extends UserComponent {
         if (!this.tileCreator || !this.tileSelector) {
             return;
         }
+        // console.log("Pointer Over " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
         //console.log("Pointer Over Pass");
-        if (this.Interaction && Tiles.getComponent(gameObject)) {
+        if (this.tileInteraction && Tiles.getComponent(gameObject)) {
+            // console.log("Pointer Over: Tile");
             var prevTile = this.tileSelector.GetPrevTile();
             if (prevTile && gameObject == prevTile.GetGameObject()) {
                 this.tileSelector.DeselectTile();
@@ -152,6 +466,7 @@ class PlayerInput extends UserComponent {
                 this.tileSelector.SelectTile(Tiles.getComponent(gameObject));
             }
         }
+        // console.log("Pointer Over RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
     }
     OnPointerUp(pointer, gameObject) {
         //console.log("Pointer Up " + this.tileCreator + " " + this.tileSelector);
@@ -159,11 +474,22 @@ class PlayerInput extends UserComponent {
         if (!this.tileCreator || !this.tileSelector) {
             return;
         }
+        // console.log("Pointer Up " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
         //console.log("Pointer Up Pass");
-        if (this.Interaction) {
+        if (this.tileInteraction) {
+            // console.log("Pointer Up: Tile");
             this.tileSelector.ValidateSelection();
-            this.Interaction = false;
+            this.interactable = true;
+            this.tileInteraction = false;
         }
+        else if (this.boosterInteraction && this.boosterObject) {
+            // console.log("Pointer Up: Booster");
+            this.boosterObject.OnInteract();
+            //this.boosterObject = false;
+            this.interactable = true;
+            this.boosterInteraction = false;
+        }
+        // console.log("Pointer Up RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
     }
     OnPointerOut(pointer, gameObject) {
         //console.log("Pointer Out");
@@ -172,7 +498,16 @@ class PlayerInput extends UserComponent {
         if (!this.tileCreator || !this.tileSelector) {
             return;
         }
+        // console.log("Pointer Out " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
         //console.log("Pointer Out Pass");
+        if (this.boosterInteraction && this.boosterObject) {
+            // console.log("Pointer Out: Booster");
+            this.boosterObject.OnCancel();
+            //this.boosterObject = false;
+            this.interactable = true;
+            this.boosterInteraction = false;
+        }
+        // console.log("Pointer Out RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
     }
     SetTileCreator(tileCreator) {
         this.tileCreator = tileCreator;
@@ -210,68 +545,113 @@ class PreloadText extends UserComponent {
 }
 /* END OF COMPILED CODE */
 // You can write more code here
-/// <reference path="./UserComponent.ts"/>
+/// <reference path="./BoosterBase.ts"/>
 // You can write more code here
 /* START OF COMPILED CODE */
 /* START-USER-IMPORTS */
 /* END-USER-IMPORTS */
-class ScoreSystem extends UserComponent {
+class ShuffleBooster extends BoosterBase {
     constructor(gameObject) {
         super(gameObject);
         this.gameObject = gameObject;
-        gameObject["__ScoreSystem"] = this;
+        gameObject["__ShuffleBooster"] = this;
         /* START-USER-CTR-CODE */
-        this.CheckLevelUp();
+        // Write your code here.
         /* END-USER-CTR-CODE */
     }
     static getComponent(gameObject) {
-        return gameObject["__ScoreSystem"];
+        return gameObject["__ShuffleBooster"];
     }
-    gameObject;
+    // private gameObject: Phaser.GameObjects.Image;
     /* START-USER-CODE */
-    hpBarText;
-    levelText;
-    hpBarImage;
-    barInitScale = 0;
-    maxHp = 0;
-    currentHp = 0;
-    currentLevel = 0;
-    static LevelFunction = function (value) {
-        return 10 * Math.pow(2, value) + 20 * Math.pow(2, Math.max(0, value - 4));
-    };
-    SetHpBarText(hpBarText) {
-        this.hpBarText = hpBarText;
-        this.CheckLevelUp();
-    }
-    SetLevelText(levelText) {
-        this.levelText = levelText;
-        this.CheckLevelUp();
-    }
-    SetHpBarImage(hpBarImage) {
-        this.hpBarImage = hpBarImage;
-        this.barInitScale = hpBarImage.scaleX;
-        this.CheckLevelUp();
-    }
-    IncrementHealth(value, relative = true) {
-        this.currentHp = Math.max(0, this.currentHp + value);
-        this.CheckLevelUp();
-        this.UpdateTexts();
-    }
-    CheckLevelUp() {
-        if (this.currentHp <= 0) {
-            this.currentLevel += 1;
-            this.maxHp = ScoreSystem.LevelFunction(this.currentLevel);
-            this.currentHp = this.maxHp;
+    static IdleTexture = "SHUFFLE";
+    static StandbyTexture = "SHUFFLE_on";
+    static DisableTexture = "SHUFFLE_off";
+    tileCreator;
+    tileSelector;
+    standby = false;
+    cooldown = 0;
+    update(time, delta) {
+        if (this.cooldown > 0) {
+            delta = delta / 1000;
+            this.cooldown -= delta;
         }
-        this.UpdateTexts();
+        if (this.cooldown <= 0) {
+            this.UpdateTexture();
+        }
     }
-    UpdateTexts() {
-        if (!this.hpBarText || !this.hpBarImage || !this.levelText) {
+    OnStandby(message) {
+        if (this.cooldown > 0) {
             return;
         }
-        this.hpBarText.setText(this.currentHp + " / " + this.maxHp);
-        this.levelText.setText("Level " + this.currentLevel);
-        this.hpBarImage.scaleX = (this.currentHp / this.maxHp) * this.barInitScale;
+        console.log("ShuffleBooster: Standby");
+        this.SetStandby(true);
+    }
+    OnInteract(message) {
+        if (this.cooldown > 0) {
+            return;
+        }
+        console.log("ShuffleBooster: Interact");
+        this.SetStandby(false);
+        this.SetCooldown(3);
+        if (!this.tileCreator) {
+            return;
+        }
+        var boardSize = this.tileCreator.GetBoardSize();
+        var randomTileList = [];
+        for (var i = 0; i < boardSize.x; i++) {
+            for (var j = 0; j < boardSize.y; j++) {
+                randomTileList.push({ x: i, y: j });
+            }
+        }
+        randomTileList = BoosterBase.shuffle(randomTileList);
+        var result = [];
+        var randomAmount = Math.floor(Math.random() * 4) + 7;
+        for (var i = 0; i < randomAmount; i++) {
+            var tile1 = randomTileList.pop();
+            var tile2 = randomTileList.pop();
+            if (!tile1 || !tile2) {
+                break;
+            }
+            result.push([tile1, tile2]);
+        }
+        console.log("Shuffle Booster, Array Length = " + result.length);
+        for (var i = 0; i < result.length; i++) {
+            console.log("Tile1: " + i + " " + result[i][0].x + ";" + result[i][0].y + " C: " + this.tileCreator.GetTileImage(result[i][0]));
+            console.log("Tile2: " + i + " " + result[i][1].x + ";" + result[i][1].y + " C: " + this.tileCreator.GetTileImage(result[i][1]));
+        }
+        this.tileCreator.SwapTiles(result);
+    }
+    OnCancel(message) {
+        console.log("ShuffleBooster: Cancel");
+        this.SetStandby(false);
+    }
+    SetCooldown(value) {
+        this.cooldown = value;
+        this.UpdateTexture();
+    }
+    SetStandby(value) {
+        this.standby = value;
+        this.UpdateTexture();
+    }
+    UpdateTexture() {
+        if (this.cooldown > 0) {
+            this.gameObject.setTexture(ShuffleBooster.DisableTexture);
+        }
+        else if (this.standby) {
+            this.gameObject.setTexture(ShuffleBooster.StandbyTexture);
+        }
+        else {
+            this.gameObject.setTexture(ShuffleBooster.IdleTexture);
+        }
+    }
+    SetTileCreator(tileCreator) {
+        this.tileCreator = tileCreator;
+        //console.log("Set Tile Creator " + this.tileCreator + " " + this.tileSelector);
+    }
+    SetTileSelector(tileSelector) {
+        this.tileSelector = tileSelector;
+        //console.log("Set Tile Selector " + this.tileCreator + " " + this.tileSelector);
     }
 }
 /* END OF COMPILED CODE */
@@ -324,11 +704,13 @@ class TileCreator extends UserComponent {
                 CurrentY += 0.5 * IncrementY;
             }
             for (var j = 0; j < tileY; j++) {
-                var newTile = this.gameObject.scene.add.image(CurrentX, CurrentY, "");
+                var newTile = this.scene.add.image(CurrentX, CurrentY, "");
                 newTile.scaleX = 0.5;
                 newTile.scaleY = 0.5;
+                var shape = new Phaser.Geom.Circle(49.5, 44, 44);
+                newTile.setInteractive(shape, Phaser.Geom.Circle.Contains);
                 var tileScript = new Tiles(newTile);
-                var index = Math.round(Math.random() * 4);
+                var index = Math.floor(Math.random() * 5);
                 tileScript.SetImage(index);
                 tileScript.SetCoord({ x: i, y: j });
                 container.add(newTile);
@@ -392,45 +774,91 @@ class TileCreator extends UserComponent {
         }
         return tileCounter;
     }
-    GetTile(x, y) {
-        if (x < this.tileArray.length) {
-            if (y < this.tileArray[x].length) {
-                return this.tileArray[x][y];
+    SwapTiles(tileList) {
+        for (var i = 0; i < tileList.length; i++) {
+            this.SwapTile(tileList[i][0], tileList[i][1]);
+        }
+    }
+    SwapTile(coord1, coord2) {
+        var tile1 = Tiles.getComponent(this.tileArray[coord1.x][coord1.y]);
+        var tile2 = Tiles.getComponent(this.tileArray[coord2.x][coord2.y]);
+        var image1 = tile1.GetImage();
+        tile1.SetImage(tile2.GetImage());
+        tile2.SetImage(image1);
+    }
+    GetBoardSize() {
+        return {
+            x: this.BoardX,
+            y: this.BoardY
+        };
+    }
+    GetTile(tile) {
+        if (tile.x < this.tileArray.length) {
+            if (tile.y < this.tileArray[tile.x].length) {
+                return this.tileArray[tile.x][tile.y];
             }
         }
         return null;
     }
+    GetTileScript(tile) {
+        var tileObj = this.GetTile(tile);
+        if (tileObj) {
+            return Tiles.getComponent(tileObj);
+        }
+        return null;
+    }
+    GetTileImage(tile) {
+        var tileObj = this.GetTile(tile);
+        if (tileObj) {
+            return Tiles.getComponent(tileObj).GetImage();
+        }
+        return -1;
+    }
     GetAllTiles() {
         return this.tileArray;
     }
-    CheckNeighbor(tile1, tile2) {
-        var coord1 = tile1.GetCoord();
-        var coord2 = tile2.GetCoord();
-        if (!this.CheckTileExist(coord2)) {
-            return false;
-        }
+    GetTileNeighbors(position) {
+        var result = [];
         for (var i = -1; i <= 1; i++) {
             for (var j = -1; j <= 1; j++) {
                 if (i == 0 && j == 0) {
                     continue;
                 }
-                if (coord1.x % 2 == 0 && i != 0 && j == -1) {
+                if (position.x % 2 == 0 && i != 0 && j == -1) {
                     continue;
                 }
-                if (coord1.x % 2 != 0 && i != 0 && j == 1) {
+                if (position.x % 2 != 0 && i != 0 && j == 1) {
                     continue;
                 }
-                var newCoord = { x: coord1.x + i, y: coord1.y + j };
-                if (coord2.x == newCoord.x && coord2.y == newCoord.y) {
-                    return true;
+                var newCoord = { x: position.x + i, y: position.y + j };
+                if (this.CheckTileExist(newCoord)) {
+                    result.push(newCoord);
                 }
+            }
+        }
+        return result;
+    }
+    CheckNeighbor(tile1, tile2) {
+        var coord1 = tile1.GetCoord();
+        var coord2 = tile2.GetCoord();
+        if (!this.CheckTileExist(coord1)) {
+            return false;
+        }
+        if (!this.CheckTileExist(coord2)) {
+            return false;
+        }
+        var neighbors = this.GetTileNeighbors(coord1);
+        for (var i = 0; i < neighbors.length; i++) {
+            var neighbor = neighbors[i];
+            if (coord2.x == neighbor.x && coord2.y == neighbor.y) {
+                return true;
             }
         }
         return false;
     }
-    CheckTileExist(tileCoord) {
-        if (tileCoord.x >= 0 && tileCoord.x < this.tileArray.length) {
-            if (tileCoord.y >= 0 && tileCoord.y < this.tileArray[tileCoord.x].length) {
+    CheckTileExist(position) {
+        if (position.x >= 0 && position.x < this.tileArray.length) {
+            if (position.y >= 0 && position.y < this.tileArray[position.x].length) {
                 return true;
             }
         }
@@ -468,7 +896,7 @@ class TileSelector extends UserComponent {
     container;
     scoreText;
     tileCreator;
-    scoreSystem;
+    levelSystem;
     connectors = [];
     tileList = [];
     static ScoreFunction = function (value) {
@@ -538,7 +966,7 @@ class TileSelector extends UserComponent {
         }
     }
     ValidateSelection() {
-        if (!this.tileCreator || !this.scoreSystem) {
+        if (!this.tileCreator || !this.levelSystem) {
             return;
         }
         if (this.tileList.length >= 3) {
@@ -550,7 +978,7 @@ class TileSelector extends UserComponent {
             var tileLength = this.tileList.length;
             this.DeselectAllTile();
             var tileCounter = this.tileCreator.ConsumeTile(tileCoords);
-            this.scoreSystem.IncrementHealth(-TileSelector.ScoreFunction(tileLength));
+            this.levelSystem.IncrementHealth(-TileSelector.ScoreFunction(tileLength));
         }
         else {
             console.log("Validate: False");
@@ -589,8 +1017,8 @@ class TileSelector extends UserComponent {
     SetTileCreator(tileCreator) {
         this.tileCreator = tileCreator;
     }
-    SetScoreSystem(scoreSystem) {
-        this.scoreSystem = scoreSystem;
+    SetLevelSystem(levelSystem) {
+        this.levelSystem = levelSystem;
     }
 }
 /// <reference path="./UserComponent.ts"/>
@@ -727,20 +1155,26 @@ class MainScene extends Phaser.Scene {
         const gameManager = this.add.image(0, 0, "_MISSING");
         gameManager.name = "GameManager";
         gameManager.visible = false;
+        // hint_booster (components)
+        new HintBooster(hint_booster);
+        // shuffle_booster (components)
+        new ShuffleBooster(shuffle_booster);
         // gameManager (components)
         new TileCreator(gameManager);
         new TileSelector(gameManager);
-        new ScoreSystem(gameManager);
+        new LevelSystem(gameManager);
         new PlayerInput(gameManager);
         this.GameManagerSetup(gameManager);
-        this.ScoreSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
+        this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
+        this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
         this.InputSetup(gameManager);
         this.PrintAll();
         this.events.emit("scene-awake");
     }
     /* START-USER-CODE */
     // this.GameManagerSetup(gameManager);
-    // this.ScoreSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
+    // this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
+    // this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
     // this.InputSetup(gameManager);
     // this.PrintAll();
     GameManagerSetup(gameManager) {
@@ -748,18 +1182,28 @@ class MainScene extends Phaser.Scene {
         var tileCreator = TileCreator.getComponent(gameManager);
         var tileSelector = TileSelector.getComponent(gameManager);
         var playerInput = PlayerInput.getComponent(gameManager);
-        var scoreSystem = ScoreSystem.getComponent(gameManager);
+        var levelSystem = LevelSystem.getComponent(gameManager);
         //console.log("Game Manager Setup " + tileCreator + " " + tileSelector + " " + playerInput);
         tileSelector.SetTileCreator(tileCreator);
-        tileSelector.SetScoreSystem(scoreSystem);
+        tileSelector.SetLevelSystem(levelSystem);
         playerInput.SetTileCreator(tileCreator);
         playerInput.SetTileSelector(tileSelector);
     }
-    ScoreSystemSetup(gameManager, hpBarText, levelText, hpBarImage) {
-        var scoreSystem = ScoreSystem.getComponent(gameManager);
-        scoreSystem.SetHpBarText(hpBarText);
-        scoreSystem.SetLevelText(levelText);
-        scoreSystem.SetHpBarImage(hpBarImage);
+    LevelSystemSetup(gameManager, hpBarText, levelText, hpBarImage) {
+        var levelSystem = LevelSystem.getComponent(gameManager);
+        levelSystem.SetHpBarText(hpBarText);
+        levelSystem.SetLevelText(levelText);
+        levelSystem.SetHpBarImage(hpBarImage);
+    }
+    BoosterSetup(gameManager, hintBooster, shuffleBooster) {
+        var tileCreator = TileCreator.getComponent(gameManager);
+        var tileSelector = TileSelector.getComponent(gameManager);
+        var hintBoosterScr = HintBooster.getComponent(hintBooster);
+        var shuffleBoosterScr = ShuffleBooster.getComponent(shuffleBooster);
+        hintBoosterScr.SetTileCreator(tileCreator);
+        hintBoosterScr.SetTileSelector(tileSelector);
+        shuffleBoosterScr.SetTileCreator(tileCreator);
+        shuffleBoosterScr.SetTileSelector(tileSelector);
     }
     InputSetup(gameManager) {
         // var playerInput = PlayerInput.getComponent(gameManager);

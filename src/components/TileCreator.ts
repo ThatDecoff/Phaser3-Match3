@@ -67,12 +67,15 @@ class TileCreator extends UserComponent {
 			}
 
 			for (var j = 0; j < tileY; j++){
-				var newTile = this.gameObject.scene.add.image(CurrentX, CurrentY, "");
+				var newTile = this.scene.add.image(CurrentX, CurrentY, "");
 				newTile.scaleX = 0.5;
 				newTile.scaleY = 0.5;
 
+				var shape = new Phaser.Geom.Circle(49.5, 44, 44);
+				newTile.setInteractive(shape, Phaser.Geom.Circle.Contains);
+
 				var tileScript = new Tiles(newTile);
-				var index = Math.round(Math.random()*4);
+				var index = Math.floor(Math.random()*5);
 				tileScript.SetImage(index);
 				tileScript.SetCoord({x: i, y: j});
 
@@ -144,51 +147,106 @@ class TileCreator extends UserComponent {
 		return tileCounter;
 	}
 
-	public GetTile(x: number, y: number){
-		if(x < this.tileArray.length){
-			if(y < this.tileArray[x].length){
-				return this.tileArray[x][y];
+	public SwapTiles(tileList: [Vector2, Vector2][]){
+		for(var i = 0; i < tileList.length; i++){
+			this.SwapTile(tileList[i][0], tileList[i][1]);
+		}
+	}
+
+	public SwapTile(coord1: Vector2, coord2: Vector2){
+		var tile1 = Tiles.getComponent(this.tileArray[coord1.x][coord1.y]);
+		var tile2 = Tiles.getComponent(this.tileArray[coord2.x][coord2.y]);
+
+		var image1 = tile1.GetImage();
+		tile1.SetImage(tile2.GetImage());
+		tile2.SetImage(image1);
+	}
+
+	public GetBoardSize(): Vector2{
+		return {
+			x: this.BoardX,
+			y: this.BoardY
+		}
+	}
+
+	public GetTile(tile: Vector2){
+		if(tile.x < this.tileArray.length){
+			if(tile.y < this.tileArray[tile.x].length){
+				return this.tileArray[tile.x][tile.y];
 			}
 		}
 		return null;
+	}
+
+	public GetTileScript(tile: Vector2){
+		var tileObj = this.GetTile(tile)
+		if(tileObj){
+			return Tiles.getComponent(tileObj);
+		}
+		return null;
+	}
+
+	public GetTileImage(tile: Vector2){
+		var tileObj = this.GetTile(tile)
+		if(tileObj){
+			return Tiles.getComponent(tileObj).GetImage();
+		}
+		return -1;
 	}
 
 	public GetAllTiles(){
 		return this.tileArray;
 	}
 
-	public CheckNeighbor(tile1: Tiles, tile2: Tiles){
-		var coord1 = tile1.GetCoord();
-		var coord2 = tile2.GetCoord();
-
-		if(!this.CheckTileExist(coord2)){
-			return false;
-		}
+	public GetTileNeighbors(position: Vector2){
+		var result: Vector2[] = [];
 
 		for (var i = -1; i <= 1; i++){
 			for (var j = -1; j <= 1; j++){
 				if(i == 0 && j == 0){
 					continue;
 				}
-				if(coord1.x % 2 == 0 && i != 0 && j == -1){
+				if(position.x % 2 == 0 && i != 0 && j == -1){
 					continue;
 				}
-				if(coord1.x % 2 != 0 && i != 0 && j == 1){
+				if(position.x % 2 != 0 && i != 0 && j == 1){
 					continue;
 				}
 
-				var newCoord: Vector2 = {x: coord1.x+i, y: coord1.y+j}
-				if(coord2.x == newCoord.x && coord2.y == newCoord.y){
-					return true;
+				var newCoord: Vector2 = {x: position.x+i, y: position.y+j}
+				if(this.CheckTileExist(newCoord)){
+					result.push(newCoord);
 				}
+			}
+		}
+		return result;
+	}
+
+	public CheckNeighbor(tile1: Tiles, tile2: Tiles){
+		var coord1 = tile1.GetCoord();
+		var coord2 = tile2.GetCoord();
+
+		if(!this.CheckTileExist(coord1)){
+			return false;
+		}
+		if(!this.CheckTileExist(coord2)){
+			return false;
+		}
+
+		var neighbors = this.GetTileNeighbors(coord1);
+		for (var i = 0; i < neighbors.length; i++){
+			var neighbor = neighbors[i];
+
+			if(coord2.x == neighbor.x && coord2.y == neighbor.y){
+				return true;
 			}
 		}
 		return false;
 	}
 
-	public CheckTileExist(tileCoord: Vector2){
-		if(tileCoord.x >= 0 && tileCoord.x < this.tileArray.length){
-			if(tileCoord.y >= 0 && tileCoord.y < this.tileArray[tileCoord.x].length){
+	public CheckTileExist(position: Vector2){
+		if(position.x >= 0 && position.x < this.tileArray.length){
+			if(position.y >= 0 && position.y < this.tileArray[position.x].length){
 				return true;
 			}
 		}

@@ -7,21 +7,21 @@
 /* START-USER-IMPORTS */
 /* END-USER-IMPORTS */
 
-class ScoreSystem extends UserComponent {
+class LevelSystem extends UserComponent {
 
 	constructor(gameObject: Phaser.GameObjects.Image) {
 		super(gameObject);
 
 		this.gameObject = gameObject;
-		(gameObject as any)["__ScoreSystem"] = this;
+		(gameObject as any)["__LevelSystem"] = this;
 
 		/* START-USER-CTR-CODE */
 		this.CheckLevelUp();
 		/* END-USER-CTR-CODE */
 	}
 
-	static getComponent(gameObject: Phaser.GameObjects.Image): ScoreSystem {
-		return (gameObject as any)["__ScoreSystem"];
+	static getComponent(gameObject: Phaser.GameObjects.Image): LevelSystem {
+		return (gameObject as any)["__LevelSystem"];
 	}
 
 	private gameObject: Phaser.GameObjects.Image;
@@ -67,7 +67,7 @@ class ScoreSystem extends UserComponent {
 		if(this.currentHp <= 0){
 			this.currentLevel += 1;
 
-			this.maxHp = ScoreSystem.LevelFunction(this.currentLevel);
+			this.maxHp = LevelSystem.LevelFunction(this.currentLevel);
 			this.currentHp = this.maxHp;
 		}
 
