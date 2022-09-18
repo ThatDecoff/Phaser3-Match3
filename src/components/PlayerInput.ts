@@ -34,6 +34,7 @@ class PlayerInput extends UserComponent {
 
 	private tileCreator?: TileCreator;
 	private tileSelector?: TileSelector;
+	private animationSystem?: AnimationSystem;
 
 	private interactable: Boolean = true;
 	private tileInteraction: Boolean = false;
@@ -85,7 +86,10 @@ class PlayerInput extends UserComponent {
 	public OnPointerDown(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject){
 		//console.log("Pointer Down " + this.tileCreator + " " + this.tileSelector);
 		//console.log(!this.tileCreator || !this.tileSelector);
-		if(!this.tileCreator || !this.tileSelector){
+		if(!this.tileCreator || !this.tileSelector || !this.animationSystem){
+			return;
+		}
+		if(this.animationSystem.IsAnimationRunning()){
 			return;
 		}
 		// console.log("Pointer Down " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
@@ -190,6 +194,10 @@ class PlayerInput extends UserComponent {
 	public SetTileSelector(tileSelector: TileSelector){
 		this.tileSelector = tileSelector;
 		//console.log("Set Tile Selector " + this.tileCreator + " " + this.tileSelector);
+	}
+
+	public SetAnimationSystem(animationSystem: AnimationSystem){
+		this.animationSystem = animationSystem;
 	}
 
 	/* END-USER-CODE */

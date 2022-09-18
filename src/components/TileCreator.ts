@@ -28,6 +28,7 @@ class TileCreator extends UserComponent {
 	private gameObject: Phaser.GameObjects.Image;
 
 	/* START-USER-CODE */
+	private animationSystem?: AnimationSystem;
 	private container: Phaser.GameObjects.Container;
 
 	// Hardcoded for now
@@ -68,8 +69,7 @@ class TileCreator extends UserComponent {
 
 			for (var j = 0; j < tileY; j++){
 				var newTile = this.scene.add.image(CurrentX, CurrentY, "");
-				newTile.scaleX = 0.5;
-				newTile.scaleY = 0.5;
+				newTile.setScale(0.5, 0.5);
 
 				var shape = new Phaser.Geom.Circle(49.5, 44, 44);
 				newTile.setInteractive(shape, Phaser.Geom.Circle.Contains);
@@ -90,13 +90,16 @@ class TileCreator extends UserComponent {
 	public ConsumeTile(consumedTiles: Vector2[]){
 		// Init Counter
 		var tileCounter: number[][] = [];
+		var tilePrev: number[][] = [];
 		var tileImages: number[][] = [];
 		for (var i = 0; i < this.BoardX; i++){
 			tileCounter.push([]);
 			tileImages.push([]);
+			tilePrev.push([]);
 			for (var j = 0; j < this.BoardY; j++){
 				tileCounter[i].push(0);
 				tileImages[i].push(0);
+				tilePrev[i].push(-1);
 			}
 		}
 
@@ -104,23 +107,12 @@ class TileCreator extends UserComponent {
 		for (var i = 0; i < consumedTiles.length; i++){
 			var value = consumedTiles[i];
 			tileCounter[value.x][value.y] += 1;
-			// for (var j = value.y; j >= 0; j++){
-			// 	tileCounter[value.x][j] += 1;
-			// }
 		}
 
 		// Increment Counters
 		for (var i = 0; i < tileCounter.length; i++){
 			for (var j = tileCounter[i].length-2; j >= 0; j--){
 				tileCounter[i][j] += tileCounter[i][j+1];
-				// if(j != tileCounter[i].length-1){
-				// 	tileCounter[i][j] += tileCounter[i][j+1];
-				// }
-				// if(j - tileCounter[i][j] >= 0){
-				// 	var tile = Tiles.getComponent(this.tileArray[i][j]);
-				// 	var prevTile = Tiles.getComponent(this.tileArray[i][j - tileCounter[i][j]]);
-				// 	tile.SetImage(prevTile.GetImage());
-				// }
 			}
 		}
 
@@ -129,10 +121,31 @@ class TileCreator extends UserComponent {
 			for (var j = 0; j < tileCounter[i].length; j++){
 				var tile = Tiles.getComponent(this.tileArray[i][j]);
 				if(j + tileCounter[i][j] < tileCounter[i].length){
-					// var nextTile = Tiles.getComponent(this.tileArray[i][j + tileCounter[i][j]]);
 					tileImages[i][j + tileCounter[i][j]] = tile.GetImage();
+					tilePrev[i][j + tileCounter[i][j]] = j;
 				}
 				tile.SetImage(tileImages[i][j]);
+			}
+		}
+
+		// Tile Down Animation
+		for (var i = 0; i < tilePrev.length; i++){
+			for (var j = 0; j < tilePrev[i].length; j++){
+				if(tilePrev[i][j] != j){
+					var tileObj = this.GetTileImage({x: i, y: j});
+					var prevTileObj = this.GetTileImage({x: i, y: tilePrev[i][j]});
+					var color = Tiles.getComponent(this.tileArray[i][j]).GetImage();
+					
+					if(tileObj && prevTileObj){
+						this.CollectTileAnimation(
+							{x: i, y: j},
+							{x: prevTileObj.x, y: prevTileObj.y},
+							{x: tileObj.x, y: tileObj.y},
+							color, false
+						)
+					}
+					
+				}
 			}
 		}
 
@@ -140,11 +153,36 @@ class TileCreator extends UserComponent {
 		for (var i = 0; i < tileCounter.length; i++){
 			for (var j = 0; j < tileCounter[i][0]; j++){
 				var tile = Tiles.getComponent(this.tileArray[i][j]);
-				var index = Math.round(Math.random()*4);
+				var index = Math.floor(Math.random()*5);
+				var tileImage = tile.GetGameObject();
+
 				tile.SetImage(index);
+				this.CollectTileAnimation(
+					{x: i, y: j},
+					{x: tileImage.x, y: 110},
+					{x: tileImage.x, y: tileImage.y},
+					index, false
+				);
 			}
 		}
 		return tileCounter;
+	}
+
+	private CollectTileAnimation(destination: Vector2, startPos: Vector2, endPos: Vector2, color: number, selected: boolean){
+		if(!this.animationSystem){
+			return;
+		}
+
+		var gameObject = this.CreateTile(startPos, color, selected);
+
+		var animation = new TileMoveAnimObj(
+			gameObject, destination,
+			startPos, endPos,
+			this
+		);
+		animation.SetMultiplier(0.5);
+
+		this.animationSystem.AddAnimation(animation);
 	}
 
 	public SwapTiles(tileList: [Vector2, Vector2][]){
@@ -157,9 +195,88 @@ class TileCreator extends UserComponent {
 		var tile1 = Tiles.getComponent(this.tileArray[coord1.x][coord1.y]);
 		var tile2 = Tiles.getComponent(this.tileArray[coord2.x][coord2.y]);
 
+		this.SwapTileAnimation(coord1, coord2);
+
 		var image1 = tile1.GetImage();
 		tile1.SetImage(tile2.GetImage());
 		tile2.SetImage(image1);
+	}
+
+	private SwapTileAnimation(tile1: Vector2, tile2: Vector2){
+		if(!this.animationSystem){
+			return;
+		}
+
+		var tileObj1 = this.GetTileImage(tile1);
+		var tileObj2 = this.GetTileImage(tile2);
+
+		var tileScript1 = Tiles.getComponent(this.tileArray[tile1.x][tile1.y]);
+		var tileScript2 = Tiles.getComponent(this.tileArray[tile2.x][tile2.y]);
+
+		if(!tileObj1 || !tileObj2){
+			return;
+		}
+
+		// console.log("Tile1");
+		// console.log(tile1.x + " " + tile1.y);
+		// console.log(tileObj1.x + " " + tileObj1.y);
+		// console.log(tileObj2.x + " " + tileObj2.y);
+
+		// var newObj1 = this.scene.add.image(tileObj1.x, tileObj1.y, "");
+		// newObj1.setScale(0.5, 0.5);
+		// newObj1.setTexture(Tiles.SelectedTextures[tileScript1.GetImage()]);
+		var newObj1 = this.CreateTile({x: tileObj1.x, y: tileObj1.y}, tileScript1.GetImage(), false);
+
+		var animation1 = new TileMoveAnimObj(
+			newObj1, tile1,
+			{x: tileObj1.x, y: tileObj1.y},
+			{x: tileObj2.x, y: tileObj2.y},
+			this
+		)
+
+		// console.log("Tile2");
+		// console.log(tile2.x + " " + tile2.y);
+		// console.log(tileObj2.x + " " + tileObj2.y);
+		// console.log(tileObj1.x + " " + tileObj1.y);
+
+		// var newObj2 = this.scene.add.image(tileObj2.x, tileObj2.y, "");
+		// newObj2.setScale(0.5, 0.5);
+		// newObj2.setTexture(Tiles.SelectedTextures[tileScript2.GetImage()]);
+		var newObj2 = this.CreateTile({x: tileObj2.x, y: tileObj2.y}, tileScript2.GetImage(), false);
+
+		var animation2 = new TileMoveAnimObj(
+			newObj2, tile2,
+			{x: tileObj2.x, y: tileObj2.y},
+			{x: tileObj1.x, y: tileObj1.y},
+			this
+		)
+
+		this.animationSystem.AddAnimation(animation1);
+		this.animationSystem.AddAnimation(animation2);
+	}
+
+	public SetTileVisibility(tile: Vector2, value: boolean){
+		var tileScript = this.GetTileScript(tile);
+		if(tileScript){
+			var tileObj = tileScript.GetGameObject();
+			tileObj.setVisible(value);
+		}
+	}
+
+	public CreateTile(position: Vector2, value: number, selected: boolean){
+		var newObj = this.scene.add.image(position.x, position.y, "");
+		newObj.setScale(0.5, 0.5);
+		if(selected){
+			newObj.setTexture(Tiles.SelectedTextures[value]);
+		}
+		else{
+			newObj.setTexture(Tiles.IdleTextures[value]);
+		}
+		
+		// var tileScript = new Tiles(newObj);
+		// tileScript.SetImage(value);
+		// tileScript.ToggleSelected(selected);
+		return newObj;
 	}
 
 	public GetBoardSize(): Vector2{
@@ -175,7 +292,7 @@ class TileCreator extends UserComponent {
 				return this.tileArray[tile.x][tile.y];
 			}
 		}
-		return null;
+		return;
 	}
 
 	public GetTileScript(tile: Vector2){
@@ -183,10 +300,18 @@ class TileCreator extends UserComponent {
 		if(tileObj){
 			return Tiles.getComponent(tileObj);
 		}
-		return null;
+		return;
 	}
 
 	public GetTileImage(tile: Vector2){
+		var tileObj = this.GetTile(tile)
+		if(tileObj){
+			return Tiles.getComponent(tileObj).GetGameObject();
+		}
+		return;
+	}
+
+	public GetTileColor(tile: Vector2){
 		var tileObj = this.GetTile(tile)
 		if(tileObj){
 			return Tiles.getComponent(tileObj).GetImage();
@@ -251,6 +376,10 @@ class TileCreator extends UserComponent {
 			}
 		}
 		return false;
+	}
+
+	public SetAnimationSystem(animationSystem: AnimationSystem){
+		this.animationSystem = animationSystem;
 	}
 
 	/* END-USER-CODE */

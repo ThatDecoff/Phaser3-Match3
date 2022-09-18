@@ -122,7 +122,9 @@
                     "text": "Level XX",
                     "align": "center",
                     "fontSize": "24px",
-                    "fontStyle": "bold"
+                    "fontStyle": "bold",
+                    "color": "#ffffffff",
+                    "stroke": "#ffffffff"
                 },
                 {
                     "type": "Text",
@@ -151,6 +153,7 @@
                 "TileSelector",
                 "ScoreSystem",
                 "LevelSystem",
+                "AnimationSystem",
                 "PlayerInput"
             ],
             "texture": {},

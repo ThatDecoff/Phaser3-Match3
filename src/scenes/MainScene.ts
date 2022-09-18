@@ -71,7 +71,7 @@ class MainScene extends Phaser.Scene {
 		level_text.name = "level_text";
 		level_text.setOrigin(0.5, 0.5);
 		level_text.text = "Level XX";
-		level_text.setStyle({ "align": "center", "fontSize": "24px", "fontStyle": "bold" });
+		level_text.setStyle({ "align": "center", "color": "#ffffffff", "fontSize": "24px", "fontStyle": "bold", "stroke": "#ffffffff" });
 		healthBarContainer.add(level_text);
 
 		// hpbar_text
@@ -97,13 +97,14 @@ class MainScene extends Phaser.Scene {
 		new TileCreator(gameManager);
 		new TileSelector(gameManager);
 		new LevelSystem(gameManager);
+		new AnimationSystem(gameManager);
 		new PlayerInput(gameManager);
 
 		this.GameManagerSetup(gameManager);
 		this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
 		this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
+		this.AnimationSetup();
 		this.InputSetup(gameManager);
-		this.PrintAll();
 		this.events.emit("scene-awake");
 	}
 
@@ -112,6 +113,7 @@ class MainScene extends Phaser.Scene {
 		// this.GameManagerSetup(gameManager);
 		// this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
 		// this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
+		// this.AnimationSetup();
 		// this.InputSetup(gameManager);
 		// this.PrintAll();
 
@@ -120,16 +122,22 @@ class MainScene extends Phaser.Scene {
 
 		var tileCreator = TileCreator.getComponent(gameManager);
 		var tileSelector = TileSelector.getComponent(gameManager);
-		var playerInput = PlayerInput.getComponent(gameManager);
 		var levelSystem = LevelSystem.getComponent(gameManager);
+		var animationSystem = AnimationSystem.getComponent(gameManager);
+		var playerInput = PlayerInput.getComponent(gameManager);
 
 		//console.log("Game Manager Setup " + tileCreator + " " + tileSelector + " " + playerInput);
+		tileCreator.SetAnimationSystem(animationSystem);
 
 		tileSelector.SetTileCreator(tileCreator);
 		tileSelector.SetLevelSystem(levelSystem);
+		tileSelector.SetAnimationSystem(animationSystem);
 
 		playerInput.SetTileCreator(tileCreator);
 		playerInput.SetTileSelector(tileSelector);
+		playerInput.SetAnimationSystem(animationSystem);
+
+		levelSystem.SetAnimationSystem(animationSystem);
 	}
 
 	private LevelSystemSetup(
@@ -161,6 +169,20 @@ class MainScene extends Phaser.Scene {
 
 		shuffleBoosterScr.SetTileCreator(tileCreator);
 		shuffleBoosterScr.SetTileSelector(tileSelector);
+	}
+
+	private AnimationSetup(){
+		this.anims.create({
+			key: "TileFx",
+			frames: "tiles_fx",
+			repeat: -1
+		});
+
+		this.anims.create({
+			key: "TileSelect",
+			frames: "tiles_select",
+			repeat: -1
+		});
 	}
 
 	private InputSetup(gameManager: Phaser.GameObjects.Image){

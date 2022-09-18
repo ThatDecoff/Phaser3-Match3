@@ -52,7 +52,7 @@ class HintBooster extends BoosterBase {
 		if(this.cooldown > 0){
 			return;
 		}
-		console.log("HintBooster: Standby");
+		// console.log("HintBooster: Standby");
 		this.SetStandby(true);
 	}
 
@@ -60,7 +60,7 @@ class HintBooster extends BoosterBase {
 		if(this.cooldown > 0){
 			return;
 		}
-		console.log("HintBooster: Interact");
+		// console.log("HintBooster: Interact");
 
 		this.SetStandby(false);
 		this.SetCooldown(5);
@@ -104,15 +104,15 @@ class HintBooster extends BoosterBase {
 
 				visitedList[vertex.x][vertex.y] = true;
 				result.push(vertex);
-				
-				color = this.tileCreator.GetTileImage(vertex);
+
+				color = this.tileCreator.GetTileColor(vertex);
 				endSearch = true;
 
 				var neighbors = this.tileCreator.GetTileNeighbors(vertex);
 				neighbors = BoosterBase.shuffle(neighbors);
 				for(var i = 0; i < neighbors.length; i++){
 					var neighbor = neighbors[i];
-					var neighborColor = this.tileCreator.GetTileImage(neighbor);
+					var neighborColor = this.tileCreator.GetTileColor(neighbor);
 					if(!visitedList[neighbor.x][neighbor.y] && neighborColor == color){
 						stack.push(neighbor);
 						endSearch = false;
@@ -139,10 +139,10 @@ class HintBooster extends BoosterBase {
 		}
 
 		// Search result query
-		console.log("Hint Booster, Array Length = " + result.length);
-		for(var i = 0; i < result.length; i++){
-			console.log("Result: " + i + " " + result[i].x + ";" + result[i].y + " C: " + this.tileCreator.GetTileImage(result[i]));
-		}
+		// console.log("Hint Booster, Array Length = " + result.length);
+		// for(var i = 0; i < result.length; i++){
+		// 	console.log("Result: " + i + " " + result[i].x + ";" + result[i].y + " C: " + this.tileCreator.GetTileImage(result[i]));
+		// }
 
 		if(result.length >= 3){
 			for(var i = 0; i < result.length; i++){
@@ -156,7 +156,7 @@ class HintBooster extends BoosterBase {
 	}
 
 	override OnCancel(message?: any){
-		console.log("HintBooster: Cancel");
+		// console.log("HintBooster: Cancel");
 		this.SetStandby(false);
 	}
 

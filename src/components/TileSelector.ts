@@ -22,8 +22,12 @@ class TileSelector extends UserComponent {
 		this.scoreText = this.scene.add.text(0, 0, "");
 		this.scoreText.setName("ScoreText");
 		this.scoreText.setFontSize(32);
+		this.scoreText.setColor("#ff0000ff");
+		this.scoreText.setStroke("#000000ff", 5);
 		this.scoreText.setAlign("center");
+		this.scoreText.setFontStyle("bold");
 		this.scoreText.setVisible(false);
+		// this.scoreText.setStyle({ "align": "center", "color": "#ff0000ff", "fontSize": "32px", "fontStyle": "bold", "stroke": "#000000ff", "strokeThickness":5});
 		//this.scene.children.moveTo(this.container, 0);
 		/* END-USER-CTR-CODE */
 	}
@@ -40,9 +44,12 @@ class TileSelector extends UserComponent {
 
 	private tileCreator?: TileCreator;
 	private levelSystem?: LevelSystem;
+	private animationSystem?: AnimationSystem;
 
 	private connectors: TileConnector[] = [];
 	private tileList: Tiles[] = [];
+
+	private tileCounter = 0;
 
 	static ScoreFunction = function(value: number){
 		return 10 * Math.pow(2, value);
@@ -66,7 +73,7 @@ class TileSelector extends UserComponent {
 			return;
 		}
 
-		console.log("Select Tile");
+		// console.log("Select Tile");
 
 		tile.ToggleSelected(true);
 
@@ -86,18 +93,25 @@ class TileSelector extends UserComponent {
 			prevConnector.edge.setAngle(polarCoord.angle);
 		}
 
+		var tileFx = this.scene.add.sprite(gameObject.x, gameObject.y, "");
+		tileFx.setOrigin(0.5, 0.5);
+		tileFx.setScale(0.5, 0.5);
+
 		this.container.add(ellipse);
 		this.container.add(rectangle);
+		this.container.add(tileFx);
 
 		this.tileList.push(tile);
-		this.connectors.push({vertice: ellipse, edge: rectangle});
+		this.connectors.push({tile: gameObject, vertice: ellipse,
+		edge: rectangle, tileFx: tileFx});
 
+		this.UpdateTileEffects();
 		this.UpdateScoreText();
 	}
 
 	public DeselectTile(){
 		if(this.tileList.length > 0){
-			console.log("Deselect Tile");
+			// console.log("Deselect Tile");
 			var tile = this.tileList.pop();
 			var connector = this.connectors.pop();
 
@@ -114,39 +128,137 @@ class TileSelector extends UserComponent {
 			tile.ToggleSelected(false);
 			connector.vertice.destroy();
 			connector.edge.destroy();
+			connector.tileFx.destroy();
 
+			this.UpdateTileEffects();
 			this.UpdateScoreText();
 		}
 	}
 
 	public DeselectAllTile(){
-		console.log("Deselect All Tile");
+		// console.log("Deselect All Tile");
 		while(this.tileList.length > 0){
 			this.DeselectTile();
 		}
 	}
 
 	public ValidateSelection(){
-		if(!this.tileCreator || !this.levelSystem){
+		if(!this.tileCreator){
 			return;
 		}
 
 		if(this.tileList.length >= 3){
-			console.log("Validate: True");
+			// console.log("Validate: True");
+			this.tileCounter = this.tileList.length;
 
-			var tileCoords: Vector2[] = [];
-			for (var i = 0; i < this.tileList.length; i++){
-				tileCoords.push(this.tileList[i].GetCoord());
+			if(this.animationSystem){
+				for (var i = 0; i < this.tileList.length; i++){
+					var tile = this.tileList[i];
+					var tileObj = tile.GetGameObject();
+
+					var newContainer = this.scene.add.container(tileObj.x, tileObj.y);
+					
+					var newTile = this.tileCreator.CreateTile(
+						{x: 0, y: 0},
+						tile.GetImage(), true
+					)
+					newContainer.add(newTile);
+
+					var tileFx = this.scene.add.sprite(newTile.x, newTile.y, "");
+					tileFx.setOrigin(0.5, 0.5);
+					tileFx.setScale(0.5, 0.5);
+					tileFx.anims.play("TileFx");
+					tileFx.setPosition(-2, 1);
+					newContainer.add(tileFx);
+
+					if(i == this.tileList.length - 1){
+						var newScoreText = this.scene.add.text(0, 0,
+							TileSelector.ScoreFunction(this.tileList.length).toString());
+						if(tile.GetCoord().x < this.tileCreator.BoardX/2){
+							newScoreText.setPosition(35, 0);
+							newScoreText.setOrigin(0, 0.5);
+						}
+						else{
+							newScoreText.setPosition(-35, 0);
+							newScoreText.setOrigin(1, 0.5);
+						}
+						newScoreText.setFontSize(32);
+						newScoreText.setColor("#ff0000ff");
+						newScoreText.setStroke("#000000ff", 5);
+						newScoreText.setAlign("center");
+						newScoreText.setFontStyle("bold");
+						newScoreText.setVisible(true);
+						newContainer.add(newScoreText);
+					}
+
+					var animation = new TileCollectAnimObj(
+						newContainer,
+						{x: newContainer.x, y: newContainer.y},
+						{x: 192, y: 110},
+						this, this.tileCreator
+					);
+					this.animationSystem.AddAnimation(animation);
+
+					var connector = this.connectors[i];
+					connector.tile.setVisible(false);
+					connector.vertice.setVisible(false);
+					connector.edge.setVisible(false);
+					connector.tileFx.setVisible(false);
+					this.scoreText.setVisible(false);
+				}
 			}
-
-			var tileLength = this.tileList.length;
-			this.DeselectAllTile();
-			var tileCounter = this.tileCreator.ConsumeTile(tileCoords);
-			this.levelSystem.IncrementHealth(-TileSelector.ScoreFunction(tileLength));
+			else{
+				this.ValidationStart();
+			}
+			
 		}
 		else{
-			console.log("Validate: False");
+			// console.log("Validate: False");
 			this.DeselectAllTile();
+		}
+	}
+
+	public DecrementCounter(){
+		this.tileCounter -= 1;
+		if(this.tileCounter == 0){
+			this.ValidationStart();
+		}
+	}
+
+	public ValidationStart(){
+		if(!this.tileCreator || !this.levelSystem){
+			return;
+		}
+
+		var tileCoords: Vector2[] = [];
+		for (var i = 0; i < this.tileList.length; i++){
+			tileCoords.push(this.tileList[i].GetCoord());
+		}
+
+		var tileLength = this.tileList.length;
+		this.DeselectAllTile();
+		this.tileCreator.ConsumeTile(tileCoords);
+		this.levelSystem.SetHealth(-TileSelector.ScoreFunction(tileLength));
+	}
+
+	public UpdateTileEffects(){
+		var valid = false;
+		if(this.tileList.length >= 3){
+			valid = true;
+		}
+
+		for(var i = 0; i < this.connectors.length; i++){
+			var tileFx = this.connectors[i].tileFx;
+			var tile = this.connectors[i].tile;
+
+			if(valid){
+				tileFx.anims.play("TileFx");
+				tileFx.setPosition(tile.x-2, tile.y+1);
+			}
+			else{
+				tileFx.anims.play("TileSelect");
+				tileFx.setPosition(tile.x, tile.y);
+			}
 		}
 	}
 
@@ -191,6 +303,10 @@ class TileSelector extends UserComponent {
 		this.levelSystem = levelSystem;
 	}
 
+	public SetAnimationSystem(animationSystem: AnimationSystem){
+		this.animationSystem = animationSystem;
+	}
+
 	/* END-USER-CODE */
 }
 
@@ -198,6 +314,8 @@ class TileSelector extends UserComponent {
 
 // You can write more code here
 interface TileConnector {
+	tile: Phaser.GameObjects.Image;
 	vertice: Phaser.GameObjects.Ellipse;
-	edge: Phaser.GameObjects.Rectangle
+	edge: Phaser.GameObjects.Rectangle;
+	tileFx: Phaser.GameObjects.Sprite
 }

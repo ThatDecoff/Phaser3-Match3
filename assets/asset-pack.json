@@ -99,8 +99,8 @@
             {
                 "url": "assets/tiles_fx/tiles_fx.png",
                 "frameConfig": {
-                    "frameWidth": 32,
-                    "frameHeight": 32,
+                    "frameWidth": 145,
+                    "frameHeight": 153,
                     "startFrame": 0,
                     "endFrame": -1,
                     "spacing": 0,
@@ -112,8 +112,8 @@
             {
                 "url": "assets/tiles_select/tiles_select.png",
                 "frameConfig": {
-                    "frameWidth": 32,
-                    "frameHeight": 32,
+                    "frameWidth": 114,
+                    "frameHeight": 105,
                     "startFrame": 0,
                     "endFrame": -1,
                     "spacing": 0,

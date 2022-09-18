@@ -16,7 +16,10 @@ class LevelSystem extends UserComponent {
 		(gameObject as any)["__LevelSystem"] = this;
 
 		/* START-USER-CTR-CODE */
-		this.CheckLevelUp();
+		this.currentLevel = 1;
+		this.maxHp = LevelSystem.LevelFunction(this.currentLevel);
+		this.currentHp = this.maxHp;
+		this.InitData();
 		/* END-USER-CTR-CODE */
 	}
 
@@ -27,6 +30,8 @@ class LevelSystem extends UserComponent {
 	private gameObject: Phaser.GameObjects.Image;
 
 	/* START-USER-CODE */
+	private animationSystem?: AnimationSystem;
+
 	private hpBarText?: Phaser.GameObjects.Text;
 	private levelText?: Phaser.GameObjects.Text;
 	private hpBarImage?: Phaser.GameObjects.Image;
@@ -42,24 +47,33 @@ class LevelSystem extends UserComponent {
 
 	public SetHpBarText(hpBarText: Phaser.GameObjects.Text){
 		this.hpBarText = hpBarText;
-		this.CheckLevelUp();
+		this.InitData();
 	}
 
 	public SetLevelText(levelText: Phaser.GameObjects.Text){
 		this.levelText = levelText;
-		this.CheckLevelUp();
+		this.InitData();
 	}
 
 	public SetHpBarImage(hpBarImage: Phaser.GameObjects.Image){
 		this.hpBarImage = hpBarImage;
 		this.barInitScale = hpBarImage.scaleX;
-		this.CheckLevelUp();
+		this.InitData();
 	}
 
-	public IncrementHealth(value: number, relative: Boolean = true){
-		this.currentHp = Math.max(0, this.currentHp + value);
-		this.CheckLevelUp();
-
+	public SetHealth(value: number, relative: Boolean = true){
+		var prevHp = this.currentHp;
+		if(relative){
+			this.currentHp = Math.max(0, this.currentHp + value);
+		}
+		else{
+			this.currentHp = Math.max(0, value);
+		}
+		
+		this.HpBarAnimation(prevHp);
+		if(!this.animationSystem){
+			this.CheckLevelUp();
+		}
 		this.UpdateTexts();
 	}
 
@@ -69,9 +83,34 @@ class LevelSystem extends UserComponent {
 
 			this.maxHp = LevelSystem.LevelFunction(this.currentLevel);
 			this.currentHp = this.maxHp;
+
+			this.HpBarAnimation(0);
+
+			this.UpdateTexts();
+		}
+	}
+
+	public HpBarAnimation(prevHp: number){
+		if(!this.hpBarImage){
+			return;
 		}
 
-		this.UpdateTexts();
+		if(this.animationSystem){
+			if(this.currentHp - prevHp == 0){
+				return;
+			}
+
+			var animation = new HpBarAnimObj(
+				this.hpBarImage,
+				(prevHp / this.maxHp) * this.barInitScale,
+				(this.currentHp / this.maxHp) * this.barInitScale,
+				this
+			);
+			this.animationSystem.AddAnimation(animation);
+		}
+		else{
+			this.hpBarImage.scaleX = (this.currentHp / this.maxHp) * this.barInitScale;
+		}
 	}
 
 	public UpdateTexts(){
@@ -81,7 +120,21 @@ class LevelSystem extends UserComponent {
 
 		this.hpBarText.setText(this.currentHp + " / " + this.maxHp);
 		this.levelText.setText("Level " + this.currentLevel);
+		// this.hpBarImage.scaleX = (this.currentHp / this.maxHp) * this.barInitScale;
+	}
+
+	private InitData(){
+		if(!this.hpBarText || !this.hpBarImage || !this.levelText){
+			return;
+		}
+
+		this.hpBarText.setText(this.currentHp + " / " + this.maxHp);
+		this.levelText.setText("Level " + this.currentLevel);
 		this.hpBarImage.scaleX = (this.currentHp / this.maxHp) * this.barInitScale;
+	}
+
+	public SetAnimationSystem(animationSystem: AnimationSystem){
+		this.animationSystem = animationSystem;
 	}
 
 	/* END-USER-CODE */
