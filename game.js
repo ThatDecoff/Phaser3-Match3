@@ -1,3 +1,4 @@
+/// <reference path="./phaser.min.js"/>
 "use strict";
 window.addEventListener('load', function () {
     var game = new Phaser.Game({
