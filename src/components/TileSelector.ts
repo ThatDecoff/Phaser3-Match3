@@ -27,8 +27,6 @@ class TileSelector extends UserComponent {
 		this.scoreText.setAlign("center");
 		this.scoreText.setFontStyle("bold");
 		this.scoreText.setVisible(false);
-		// this.scoreText.setStyle({ "align": "center", "color": "#ff0000ff", "fontSize": "32px", "fontStyle": "bold", "stroke": "#000000ff", "strokeThickness":5});
-		//this.scene.children.moveTo(this.container, 0);
 		/* END-USER-CTR-CODE */
 	}
 
@@ -57,14 +55,12 @@ class TileSelector extends UserComponent {
 	};
 
 	public SelectTile(tile: Tiles, playerInput: boolean = true){
-		//console.log("Select Tile");
 		if(tile.IsSelected()){
 			return;
 		}
 		if(!this.tileCreator){
 			return;
 		}
-		//console.log("Select Tile Pass");
 
 		var prevTile = this.tileList[this.tileList.length-1];
 		if(this.tileList.length > 0 && tile.GetImage() != prevTile.GetImage()){
@@ -91,7 +87,6 @@ class TileSelector extends UserComponent {
 			var prevObj = prevTile.GetGameObject();
 			var prevConnector = this.connectors[this.connectors.length-1];
 			var polarCoord = Tiles.ToRadian({x: gameObject.x - prevObj.x, y: gameObject.y - prevObj.y});
-			//console.log(polarCoord.r + " " + polarCoord.angle);
 			prevConnector.edge.setSize(polarCoord.r, 4);
 			prevConnector.edge.setAngle(polarCoord.angle);
 		}
@@ -114,7 +109,6 @@ class TileSelector extends UserComponent {
 
 	public DeselectTile(playerInput: boolean = true){
 		if(this.tileList.length > 0){
-			// console.log("Deselect Tile");
 			var tile = this.tileList.pop();
 			var connector = this.connectors.pop();
 
@@ -143,7 +137,6 @@ class TileSelector extends UserComponent {
 	}
 
 	public DeselectAllTile(playerInput: boolean = true){
-		// console.log("Deselect All Tile");
 		while(this.tileList.length > 0){
 			this.DeselectTile(playerInput);
 		}
@@ -155,7 +148,6 @@ class TileSelector extends UserComponent {
 		}
 
 		if(this.tileList.length >= 3){
-			// console.log("Validate: True");
 			this.tileCounter = this.tileList.length;
 
 			if(this.soundSystem){
@@ -224,7 +216,6 @@ class TileSelector extends UserComponent {
 			
 		}
 		else{
-			// console.log("Validate: False");
 			this.DeselectAllTile(false);
 		}
 	}

@@ -51,7 +51,6 @@ class ShuffleBooster extends BoosterBase {
 		if(this.cooldown > 0){
 			return;
 		}
-		// console.log("ShuffleBooster: Standby");
 		this.SetStandby(true);
 	}
 
@@ -59,7 +58,6 @@ class ShuffleBooster extends BoosterBase {
 		if(this.cooldown > 0){
 			return;
 		}
-		// console.log("ShuffleBooster: Interact");
 
 		this.SetStandby(false);
 		this.SetCooldown(3);
@@ -81,7 +79,6 @@ class ShuffleBooster extends BoosterBase {
 		var result: [Vector2, Vector2][] = [];
 
 		var randomAmount = Math.floor(Math.random()*5)+12;
-		// var randomAmount = 1;
 		for(var i = 0; i < randomAmount; i++){
 			var tile1 = randomTileList.pop();
 			var tile2 = randomTileList.pop();
@@ -92,18 +89,10 @@ class ShuffleBooster extends BoosterBase {
 
 			result.push([tile1, tile2]);
 		}
-
-		// console.log("Shuffle Booster, Array Length = " + result.length);
-		// for(var i = 0; i < result.length; i++){
-		// 	console.log("Tile1: " + i + " " + result[i][0].x + ";" + result[i][0].y + " C: " + this.tileCreator.GetTileImage(result[i][0]));
-		// 	console.log("Tile2: " + i + " " + result[i][1].x + ";" + result[i][1].y + " C: " + this.tileCreator.GetTileImage(result[i][1]));
-		// }
-
 		this.tileCreator.SwapTiles(result);
 	}
 
 	override OnCancel(message?: any){
-		// console.log("ShuffleBooster: Cancel");
 		this.SetStandby(false);
 	}
 
@@ -131,12 +120,10 @@ class ShuffleBooster extends BoosterBase {
 
 	public SetTileCreator(tileCreator: TileCreator){
 		this.tileCreator = tileCreator;
-		//console.log("Set Tile Creator " + this.tileCreator + " " + this.tileSelector);
 	}
 
 	public SetTileSelector(tileSelector: TileSelector){
 		this.tileSelector = tileSelector;
-		//console.log("Set Tile Selector " + this.tileCreator + " " + this.tileSelector);
 	}
 	/* END-USER-CODE */
 }

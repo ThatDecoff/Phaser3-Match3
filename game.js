@@ -1,4 +1,3 @@
-/// <reference path="./phaser.min.js"/>
 "use strict";
 window.addEventListener('load', function () {
     var game = new Phaser.Game({
@@ -165,21 +164,15 @@ class BoosterBase extends UserComponent {
     SetInteractive() {
         var shape = new Phaser.Geom.Circle(75, 60, 37.5);
         this.gameObject.setInteractive(shape, Phaser.Geom.Circle.Contains);
-        // var graphics = this.scene.add.graphics({ x: this.gameObject.x - this.gameObject.displayOriginX, y: this.gameObject.y - this.gameObject.displayOriginY });
-        // graphics.lineStyle(2, 0x00aa00);
-        // graphics.strokeCircle(75, 60, 37.5);
     }
     OnStandby(message) {
         // Override
-        //console.log("BoosterBase: Standby");
     }
     OnInteract(message) {
         // Override
-        //console.log("BoosterBase: Interact");
     }
     OnCancel(message) {
         // Override
-        //console.log("BoosterBase: Cancel");
     }
     static shuffle(array) {
         var currentIndex = array.length;
@@ -192,25 +185,6 @@ class BoosterBase extends UserComponent {
         }
         return array;
     }
-}
-/* END OF COMPILED CODE */
-// You can write more code here
-// You can write more code here
-/* START OF COMPILED CODE */
-/* START-USER-IMPORTS */
-/* END-USER-IMPORTS */
-class Component {
-    constructor(gameObject) {
-        this.gameObject = gameObject;
-        gameObject["__Component"] = this;
-        /* START-USER-CTR-CODE */
-        // Write your code here.
-        /* END-USER-CTR-CODE */
-    }
-    static getComponent(gameObject) {
-        return gameObject["__Component"];
-    }
-    gameObject;
 }
 /* END OF COMPILED CODE */
 // You can write more code here
@@ -231,7 +205,6 @@ class HintBooster extends BoosterBase {
     static getComponent(gameObject) {
         return gameObject["__HintBooster"];
     }
-    // private gameObject: Phaser.GameObjects.Image;
     /* START-USER-CODE */
     static IdleTexture = "RAINBOW";
     static StandbyTexture = "RAINBOW_on";
@@ -244,7 +217,6 @@ class HintBooster extends BoosterBase {
         if (this.cooldown > 0) {
             delta = delta / 1000;
             this.cooldown -= delta;
-            // console.log(this.cooldown + " " + delta);
         }
         if (this.cooldown <= 0) {
             this.UpdateTexture();
@@ -254,14 +226,12 @@ class HintBooster extends BoosterBase {
         if (this.cooldown > 0) {
             return;
         }
-        // console.log("HintBooster: Standby");
         this.SetStandby(true);
     }
     OnInteract(message) {
         if (this.cooldown > 0) {
             return;
         }
-        // console.log("HintBooster: Interact");
         this.SetStandby(false);
         this.SetCooldown(5);
         if (!this.tileCreator || !this.tileSelector) {
@@ -328,10 +298,6 @@ class HintBooster extends BoosterBase {
             }
         }
         // Search result query
-        // console.log("Hint Booster, Array Length = " + result.length);
-        // for(var i = 0; i < result.length; i++){
-        // 	console.log("Result: " + i + " " + result[i].x + ";" + result[i].y + " C: " + this.tileCreator.GetTileImage(result[i]));
-        // }
         if (result.length >= 3) {
             for (var i = 0; i < result.length; i++) {
                 var resTileScript = this.tileCreator.GetTileScript(result[i]);
@@ -343,7 +309,6 @@ class HintBooster extends BoosterBase {
         }
     }
     OnCancel(message) {
-        // console.log("HintBooster: Cancel");
         this.SetStandby(false);
     }
     SetCooldown(value) {
@@ -367,11 +332,9 @@ class HintBooster extends BoosterBase {
     }
     SetTileCreator(tileCreator) {
         this.tileCreator = tileCreator;
-        //console.log("Set Tile Creator " + this.tileCreator + " " + this.tileSelector);
     }
     SetTileSelector(tileSelector) {
         this.tileSelector = tileSelector;
-        //console.log("Set Tile Selector " + this.tileCreator + " " + this.tileSelector);
     }
 }
 /* END OF COMPILED CODE */
@@ -411,11 +374,9 @@ class HpBarAnimObj extends BaseAnimObj {
         var moveDist = Math.abs(movement);
         var targetDist = Math.abs(this.endVal - this.gameObject.scaleX);
         if (moveDist < targetDist) {
-            // console.log("Move " + this.tilePos.x + " " + this.tilePos.y);
             this.gameObject.setScale(this.gameObject.scaleX + movement, this.gameObject.scaleY);
         }
         else {
-            // console.log("Snap " + this.tilePos.x + " " + this.tilePos.y);
             this.gameObject.setScale(this.endVal, this.gameObject.scaleY);
             this.OnFinish();
             this.isFinished = true;
@@ -516,7 +477,6 @@ class LevelSystem extends UserComponent {
         }
         this.hpBarText.setText(this.currentHp + " / " + this.maxHp);
         this.levelText.setText("Level " + this.currentLevel);
-        // this.hpBarImage.scaleX = (this.currentHp / this.maxHp) * this.barInitScale;
     }
     InitData() {
         if (!this.hpBarText || !this.hpBarImage || !this.levelText) {
@@ -564,24 +524,6 @@ class PlayerInput extends UserComponent {
     tileInteraction = false;
     boosterInteraction = false;
     boosterObject;
-    start() {
-        // this.PrepareInteractionBox();
-    }
-    PrepareInteractionBox() {
-        //console.log("Prepare Interaction " + this.tileCreator + " " + this.tileSelector);
-        if (!this.tileCreator) {
-            return;
-        }
-        //console.log("Prepare Interaction Pass");
-        var tiles = this.tileCreator.GetAllTiles();
-        for (var i = 0; i < tiles.length; i++) {
-            for (var j = 0; j < tiles[i].length; j++) {
-                var gameObject = tiles[i][j];
-                var shape = new Phaser.Geom.Circle(49.5, 44, 44);
-                gameObject.setInteractive(shape, Phaser.Geom.Circle.Contains);
-            }
-        }
-    }
     // Static Functions
     static OnPointerDown(pointer, gameObject) {
         return PlayerInput.Instance.OnPointerDown(pointer, gameObject);
@@ -597,41 +539,29 @@ class PlayerInput extends UserComponent {
     }
     // OnAction Functions
     OnPointerDown(pointer, gameObject) {
-        //console.log("Pointer Down " + this.tileCreator + " " + this.tileSelector);
-        //console.log(!this.tileCreator || !this.tileSelector);
         if (!this.tileCreator || !this.tileSelector || !this.animationSystem) {
             return;
         }
         if (this.animationSystem.IsAnimationRunning()) {
             return;
         }
-        // console.log("Pointer Down " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
-        //console.log("Pointer Down Pass");
         if (this.interactable && Tiles.getComponent(gameObject)) {
-            // console.log("Pointer Down: Tile");
             this.interactable = false;
             this.tileInteraction = true;
             this.tileSelector.SelectTile(Tiles.getComponent(gameObject));
         }
         else if (this.interactable && BoosterBase.getComponent(gameObject)) {
-            // console.log("Pointer Down: Booster");
             this.interactable = false;
             this.boosterInteraction = true;
             this.boosterObject = BoosterBase.getComponent(gameObject);
             this.boosterObject.OnStandby();
         }
-        // console.log("Pointer Down RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
     }
     OnPointerOver(pointer, gameObject) {
-        //console.log("Pointer Over " + this.tileCreator + " " + this.tileSelector);
-        //console.log(!this.tileCreator || !this.tileSelector);
         if (!this.tileCreator || !this.tileSelector) {
             return;
         }
-        // console.log("Pointer Over " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
-        //console.log("Pointer Over Pass");
         if (this.tileInteraction && Tiles.getComponent(gameObject)) {
-            // console.log("Pointer Over: Tile");
             var prevTile = this.tileSelector.GetPrevTile();
             if (prevTile && gameObject == prevTile.GetGameObject()) {
                 this.tileSelector.DeselectTile();
@@ -640,56 +570,37 @@ class PlayerInput extends UserComponent {
                 this.tileSelector.SelectTile(Tiles.getComponent(gameObject));
             }
         }
-        // console.log("Pointer Over RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
     }
     OnPointerUp(pointer, gameObject) {
-        //console.log("Pointer Up " + this.tileCreator + " " + this.tileSelector);
-        //console.log(!this.tileCreator || !this.tileSelector);
         if (!this.tileCreator || !this.tileSelector) {
             return;
         }
-        // console.log("Pointer Up " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
-        //console.log("Pointer Up Pass");
         if (this.tileInteraction) {
-            // console.log("Pointer Up: Tile");
             this.tileSelector.ValidateSelection();
             this.interactable = true;
             this.tileInteraction = false;
         }
         else if (this.boosterInteraction && this.boosterObject) {
-            // console.log("Pointer Up: Booster");
             this.boosterObject.OnInteract();
-            //this.boosterObject = false;
             this.interactable = true;
             this.boosterInteraction = false;
         }
-        // console.log("Pointer Up RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
     }
     OnPointerOut(pointer, gameObject) {
-        //console.log("Pointer Out");
-        //console.log("Pointer Out " + this.tileCreator + " " + this.tileSelector);
-        //console.log(!this.tileCreator || !this.tileSelector);
         if (!this.tileCreator || !this.tileSelector) {
             return;
         }
-        // console.log("Pointer Out " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
-        //console.log("Pointer Out Pass");
         if (this.boosterInteraction && this.boosterObject) {
-            // console.log("Pointer Out: Booster");
             this.boosterObject.OnCancel();
-            //this.boosterObject = false;
             this.interactable = true;
             this.boosterInteraction = false;
         }
-        // console.log("Pointer Out RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
     }
     SetTileCreator(tileCreator) {
         this.tileCreator = tileCreator;
-        //console.log("Set Tile Creator " + this.tileCreator + " " + this.tileSelector);
     }
     SetTileSelector(tileSelector) {
         this.tileSelector = tileSelector;
-        //console.log("Set Tile Selector " + this.tileCreator + " " + this.tileSelector);
     }
     SetAnimationSystem(animationSystem) {
         this.animationSystem = animationSystem;
@@ -761,14 +672,12 @@ class ShuffleBooster extends BoosterBase {
         if (this.cooldown > 0) {
             return;
         }
-        // console.log("ShuffleBooster: Standby");
         this.SetStandby(true);
     }
     OnInteract(message) {
         if (this.cooldown > 0) {
             return;
         }
-        // console.log("ShuffleBooster: Interact");
         this.SetStandby(false);
         this.SetCooldown(3);
         if (!this.tileCreator) {
@@ -784,7 +693,6 @@ class ShuffleBooster extends BoosterBase {
         randomTileList = BoosterBase.shuffle(randomTileList);
         var result = [];
         var randomAmount = Math.floor(Math.random() * 5) + 12;
-        // var randomAmount = 1;
         for (var i = 0; i < randomAmount; i++) {
             var tile1 = randomTileList.pop();
             var tile2 = randomTileList.pop();
@@ -793,15 +701,9 @@ class ShuffleBooster extends BoosterBase {
             }
             result.push([tile1, tile2]);
         }
-        // console.log("Shuffle Booster, Array Length = " + result.length);
-        // for(var i = 0; i < result.length; i++){
-        // 	console.log("Tile1: " + i + " " + result[i][0].x + ";" + result[i][0].y + " C: " + this.tileCreator.GetTileImage(result[i][0]));
-        // 	console.log("Tile2: " + i + " " + result[i][1].x + ";" + result[i][1].y + " C: " + this.tileCreator.GetTileImage(result[i][1]));
-        // }
         this.tileCreator.SwapTiles(result);
     }
     OnCancel(message) {
-        // console.log("ShuffleBooster: Cancel");
         this.SetStandby(false);
     }
     SetCooldown(value) {
@@ -825,11 +727,9 @@ class ShuffleBooster extends BoosterBase {
     }
     SetTileCreator(tileCreator) {
         this.tileCreator = tileCreator;
-        //console.log("Set Tile Creator " + this.tileCreator + " " + this.tileSelector);
     }
     SetTileSelector(tileSelector) {
         this.tileSelector = tileSelector;
-        //console.log("Set Tile Selector " + this.tileCreator + " " + this.tileSelector);
     }
 }
 /* END OF COMPILED CODE */
@@ -890,12 +790,6 @@ class TileCollectAnimObj extends BaseAnimObj {
         this.moveDir = { x: distance.x / lenDistance, y: distance.y / lenDistance };
         this.speed = lenDistance;
         this.scaleSpeed = gameObject.scaleX * 0.4;
-        console.log("TileMoveAnimObj");
-        console.log("distance " + distance.x + " " + distance.y);
-        console.log("lenDistance " + lenDistance);
-        console.log("moveDir " + this.moveDir.x + " " + this.moveDir.y);
-        console.log("speed " + this.speed);
-        console.log("target " + this.target.x + " " + this.target.y);
     }
     gameObject;
     startPos;
@@ -947,7 +841,6 @@ class TileCollectAnimObj extends BaseAnimObj {
         this.print += 1;
     }
     OnFinish() {
-        // this.tileCreator.SetTileVisibility(this.tilePos, true);
         this.tileSelector.DecrementCounter();
         this.gameObject.destroy();
     }
@@ -960,18 +853,11 @@ class TileCollectAnimObj extends BaseAnimObj {
             Math.abs(this.target.y - this.gameObject.y);
         var moveDist = Math.abs(movement.x) +
             Math.abs(movement.y);
-        if (this.print < 2) {
-            console.log("Phase1 " + targetDist + " " + moveDist);
-            console.log("target " + this.target.x + " " + this.target.y);
-            console.log("movement " + movement.x + " " + movement.y);
-        }
         if (moveDist < targetDist) {
-            // console.log("Phase1Move " + this.startPos.x + " " + this.startPos.y);
             this.gameObject.setPosition(movement.x + this.gameObject.x, movement.y + this.gameObject.y);
             this.gameObject.setScale(scale.x + this.gameObject.scaleX, scale.y + this.gameObject.scaleY);
         }
         else {
-            // console.log("Phase1Snap " + this.startPos.x + " " + this.startPos.y);
             this.gameObject.setPosition(this.target.x, this.target.y);
             this.gameObject.setScale(scale.x + this.gameObject.scaleX, scale.y + this.gameObject.scaleY);
             var distance = {
@@ -993,15 +879,11 @@ class TileCollectAnimObj extends BaseAnimObj {
             Math.abs(this.endPos.y - this.gameObject.y);
         var moveDist = Math.abs(movement.x) +
             Math.abs(movement.y);
-        // console.log("MoveSnap " + targetDist + " " + moveDist);
-        // console.log("Phase2 " + targetDist + " " + moveDist);
         if (moveDist < targetDist) {
-            // console.log("Phase2Move " + this.startPos.x + " " + this.startPos.y);
             this.gameObject.setPosition(movement.x + this.gameObject.x, movement.y + this.gameObject.y);
             this.gameObject.setScale(scale.x + this.gameObject.scaleX, scale.y + this.gameObject.scaleY);
         }
         else {
-            // console.log("Phase2Snap " + this.startPos.x + " " + this.startPos.y);
             this.gameObject.setPosition(this.endPos.x, this.endPos.y);
             this.OnFinish();
             this.isFinished = true;
@@ -1174,22 +1056,8 @@ class TileCreator extends UserComponent {
         if (!tileObj1 || !tileObj2) {
             return;
         }
-        // console.log("Tile1");
-        // console.log(tile1.x + " " + tile1.y);
-        // console.log(tileObj1.x + " " + tileObj1.y);
-        // console.log(tileObj2.x + " " + tileObj2.y);
-        // var newObj1 = this.scene.add.image(tileObj1.x, tileObj1.y, "");
-        // newObj1.setScale(0.5, 0.5);
-        // newObj1.setTexture(Tiles.SelectedTextures[tileScript1.GetImage()]);
         var newObj1 = this.CreateTile({ x: tileObj1.x, y: tileObj1.y }, tileScript1.GetImage(), false);
         var animation1 = new TileMoveAnimObj(newObj1, tile1, { x: tileObj1.x, y: tileObj1.y }, { x: tileObj2.x, y: tileObj2.y }, this);
-        // console.log("Tile2");
-        // console.log(tile2.x + " " + tile2.y);
-        // console.log(tileObj2.x + " " + tileObj2.y);
-        // console.log(tileObj1.x + " " + tileObj1.y);
-        // var newObj2 = this.scene.add.image(tileObj2.x, tileObj2.y, "");
-        // newObj2.setScale(0.5, 0.5);
-        // newObj2.setTexture(Tiles.SelectedTextures[tileScript2.GetImage()]);
         var newObj2 = this.CreateTile({ x: tileObj2.x, y: tileObj2.y }, tileScript2.GetImage(), false);
         var animation2 = new TileMoveAnimObj(newObj2, tile2, { x: tileObj2.x, y: tileObj2.y }, { x: tileObj1.x, y: tileObj1.y }, this);
         this.animationSystem.AddAnimation(animation1);
@@ -1211,9 +1079,6 @@ class TileCreator extends UserComponent {
         else {
             newObj.setTexture(Tiles.IdleTextures[value]);
         }
-        // var tileScript = new Tiles(newObj);
-        // tileScript.SetImage(value);
-        // tileScript.ToggleSelected(selected);
         return newObj;
     }
     GetBoardSize() {
@@ -1327,11 +1192,6 @@ class TileMoveAnimObj extends BaseAnimObj {
             Math.pow(distance.y, 2));
         this.moveDir = { x: distance.x / lenDistance, y: distance.y / lenDistance };
         this.speed = lenDistance;
-        // console.log("TileMoveAnimObj");
-        // console.log("distance " + distance.x + " " + distance.y);
-        // console.log("lenDistance " + lenDistance);
-        // console.log("moveDir " + this.moveDir.x + " " + this.moveDir.y);
-        // console.log("speed " + this.speed);
     }
     gameObject;
     tilePos;
@@ -1375,13 +1235,10 @@ class TileMoveAnimObj extends BaseAnimObj {
             Math.abs(this.endPos.y - this.gameObject.y);
         var moveDist = Math.abs(movement.x) +
             Math.abs(movement.y);
-        // console.log("MoveSnap " + targetDist + " " + moveDist);
         if (moveDist < targetDist) {
-            // console.log("Move " + this.tilePos.x + " " + this.tilePos.y);
             this.gameObject.setPosition(movement.x + this.gameObject.x, movement.y + this.gameObject.y);
         }
         else {
-            // console.log("Snap " + this.tilePos.x + " " + this.tilePos.y);
             this.gameObject.setPosition(this.endPos.x, this.endPos.y);
             this.OnFinish();
             this.isFinished = true;
@@ -1409,8 +1266,6 @@ class TileSelector extends UserComponent {
         this.scoreText.setAlign("center");
         this.scoreText.setFontStyle("bold");
         this.scoreText.setVisible(false);
-        // this.scoreText.setStyle({ "align": "center", "color": "#ff0000ff", "fontSize": "32px", "fontStyle": "bold", "stroke": "#000000ff", "strokeThickness":5});
-        //this.scene.children.moveTo(this.container, 0);
         /* END-USER-CTR-CODE */
     }
     static getComponent(gameObject) {
@@ -1431,14 +1286,12 @@ class TileSelector extends UserComponent {
         return 10 * Math.pow(2, value);
     };
     SelectTile(tile, playerInput = true) {
-        //console.log("Select Tile");
         if (tile.IsSelected()) {
             return;
         }
         if (!this.tileCreator) {
             return;
         }
-        //console.log("Select Tile Pass");
         var prevTile = this.tileList[this.tileList.length - 1];
         if (this.tileList.length > 0 && tile.GetImage() != prevTile.GetImage()) {
             return;
@@ -1460,7 +1313,6 @@ class TileSelector extends UserComponent {
             var prevObj = prevTile.GetGameObject();
             var prevConnector = this.connectors[this.connectors.length - 1];
             var polarCoord = Tiles.ToRadian({ x: gameObject.x - prevObj.x, y: gameObject.y - prevObj.y });
-            //console.log(polarCoord.r + " " + polarCoord.angle);
             prevConnector.edge.setSize(polarCoord.r, 4);
             prevConnector.edge.setAngle(polarCoord.angle);
         }
@@ -1478,7 +1330,6 @@ class TileSelector extends UserComponent {
     }
     DeselectTile(playerInput = true) {
         if (this.tileList.length > 0) {
-            // console.log("Deselect Tile");
             var tile = this.tileList.pop();
             var connector = this.connectors.pop();
             if (!tile || !connector) {
@@ -1501,7 +1352,6 @@ class TileSelector extends UserComponent {
         }
     }
     DeselectAllTile(playerInput = true) {
-        // console.log("Deselect All Tile");
         while (this.tileList.length > 0) {
             this.DeselectTile(playerInput);
         }
@@ -1511,7 +1361,6 @@ class TileSelector extends UserComponent {
             return;
         }
         if (this.tileList.length >= 3) {
-            // console.log("Validate: True");
             this.tileCounter = this.tileList.length;
             if (this.soundSystem) {
                 this.soundSystem.PlaySound("tile_collect");
@@ -1562,7 +1411,6 @@ class TileSelector extends UserComponent {
             }
         }
         else {
-            // console.log("Validate: False");
             this.DeselectAllTile(false);
         }
     }

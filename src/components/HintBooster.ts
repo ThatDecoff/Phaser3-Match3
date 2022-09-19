@@ -24,8 +24,6 @@ class HintBooster extends BoosterBase {
 		return (gameObject as any)["__HintBooster"];
 	}
 
-	// private gameObject: Phaser.GameObjects.Image;
-
 	/* START-USER-CODE */
 	static IdleTexture: string = "RAINBOW";
 	static StandbyTexture: string = "RAINBOW_on";
@@ -41,7 +39,6 @@ class HintBooster extends BoosterBase {
 		if(this.cooldown > 0){
 			delta = delta / 1000;
 			this.cooldown -= delta;
-			// console.log(this.cooldown + " " + delta);
 		}
 		if(this.cooldown <= 0){
 			this.UpdateTexture();
@@ -52,7 +49,6 @@ class HintBooster extends BoosterBase {
 		if(this.cooldown > 0){
 			return;
 		}
-		// console.log("HintBooster: Standby");
 		this.SetStandby(true);
 	}
 
@@ -60,7 +56,6 @@ class HintBooster extends BoosterBase {
 		if(this.cooldown > 0){
 			return;
 		}
-		// console.log("HintBooster: Interact");
 
 		this.SetStandby(false);
 		this.SetCooldown(5);
@@ -139,11 +134,6 @@ class HintBooster extends BoosterBase {
 		}
 
 		// Search result query
-		// console.log("Hint Booster, Array Length = " + result.length);
-		// for(var i = 0; i < result.length; i++){
-		// 	console.log("Result: " + i + " " + result[i].x + ";" + result[i].y + " C: " + this.tileCreator.GetTileImage(result[i]));
-		// }
-
 		if(result.length >= 3){
 			for(var i = 0; i < result.length; i++){
 				var resTileScript = this.tileCreator.GetTileScript(result[i]);
@@ -156,7 +146,6 @@ class HintBooster extends BoosterBase {
 	}
 
 	override OnCancel(message?: any){
-		// console.log("HintBooster: Cancel");
 		this.SetStandby(false);
 	}
 
@@ -184,12 +173,10 @@ class HintBooster extends BoosterBase {
 
 	public SetTileCreator(tileCreator: TileCreator){
 		this.tileCreator = tileCreator;
-		//console.log("Set Tile Creator " + this.tileCreator + " " + this.tileSelector);
 	}
 
 	public SetTileSelector(tileSelector: TileSelector){
 		this.tileSelector = tileSelector;
-		//console.log("Set Tile Selector " + this.tileCreator + " " + this.tileSelector);
 	}
 	/* END-USER-CODE */
 }

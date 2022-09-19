@@ -228,14 +228,6 @@ class TileCreator extends UserComponent {
 			return;
 		}
 
-		// console.log("Tile1");
-		// console.log(tile1.x + " " + tile1.y);
-		// console.log(tileObj1.x + " " + tileObj1.y);
-		// console.log(tileObj2.x + " " + tileObj2.y);
-
-		// var newObj1 = this.scene.add.image(tileObj1.x, tileObj1.y, "");
-		// newObj1.setScale(0.5, 0.5);
-		// newObj1.setTexture(Tiles.SelectedTextures[tileScript1.GetImage()]);
 		var newObj1 = this.CreateTile({x: tileObj1.x, y: tileObj1.y}, tileScript1.GetImage(), false);
 
 		var animation1 = new TileMoveAnimObj(
@@ -245,14 +237,6 @@ class TileCreator extends UserComponent {
 			this
 		)
 
-		// console.log("Tile2");
-		// console.log(tile2.x + " " + tile2.y);
-		// console.log(tileObj2.x + " " + tileObj2.y);
-		// console.log(tileObj1.x + " " + tileObj1.y);
-
-		// var newObj2 = this.scene.add.image(tileObj2.x, tileObj2.y, "");
-		// newObj2.setScale(0.5, 0.5);
-		// newObj2.setTexture(Tiles.SelectedTextures[tileScript2.GetImage()]);
 		var newObj2 = this.CreateTile({x: tileObj2.x, y: tileObj2.y}, tileScript2.GetImage(), false);
 
 		var animation2 = new TileMoveAnimObj(
@@ -283,10 +267,7 @@ class TileCreator extends UserComponent {
 		else{
 			newObj.setTexture(Tiles.IdleTextures[value]);
 		}
-		
-		// var tileScript = new Tiles(newObj);
-		// tileScript.SetImage(value);
-		// tileScript.ToggleSelected(selected);
+
 		return newObj;
 	}
 

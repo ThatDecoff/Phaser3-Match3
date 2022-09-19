@@ -124,7 +124,6 @@ class LevelSystem extends UserComponent {
 
 		this.hpBarText.setText(this.currentHp + " / " + this.maxHp);
 		this.levelText.setText("Level " + this.currentLevel);
-		// this.hpBarImage.scaleX = (this.currentHp / this.maxHp) * this.barInitScale;
 	}
 
 	private InitData(){

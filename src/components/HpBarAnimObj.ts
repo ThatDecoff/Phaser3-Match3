@@ -52,12 +52,10 @@ class HpBarAnimObj extends BaseAnimObj {
         var targetDist = Math.abs(this.endVal - this.gameObject.scaleX);
         
         if(moveDist < targetDist){
-            // console.log("Move " + this.tilePos.x + " " + this.tilePos.y);
             this.gameObject.setScale(this.gameObject.scaleX + movement,
                 this.gameObject.scaleY);
         }
         else{
-            // console.log("Snap " + this.tilePos.x + " " + this.tilePos.y);
             this.gameObject.setScale(this.endVal, this.gameObject.scaleY);
             this.OnFinish();
             this.isFinished = true;

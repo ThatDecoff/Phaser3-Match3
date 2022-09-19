@@ -25,12 +25,6 @@ class TileMoveAnimObj extends BaseAnimObj {
 
         this.moveDir = {x: distance.x / lenDistance, y: distance.y / lenDistance};
         this.speed = lenDistance;
-
-        // console.log("TileMoveAnimObj");
-        // console.log("distance " + distance.x + " " + distance.y);
-        // console.log("lenDistance " + lenDistance);
-        // console.log("moveDir " + this.moveDir.x + " " + this.moveDir.y);
-        // console.log("speed " + this.speed);
     }
 
     private gameObject: Phaser.GameObjects.Image;
@@ -88,15 +82,11 @@ class TileMoveAnimObj extends BaseAnimObj {
         var moveDist = Math.abs(movement.x) +
             Math.abs(movement.y);
         
-        // console.log("MoveSnap " + targetDist + " " + moveDist);
-        
         if(moveDist < targetDist){
-            // console.log("Move " + this.tilePos.x + " " + this.tilePos.y);
             this.gameObject.setPosition(movement.x + this.gameObject.x,
                 movement.y + this.gameObject.y);
         }
         else{
-            // console.log("Snap " + this.tilePos.x + " " + this.tilePos.y);
             this.gameObject.setPosition(this.endPos.x, this.endPos.y);
             this.OnFinish();
             this.isFinished = true;

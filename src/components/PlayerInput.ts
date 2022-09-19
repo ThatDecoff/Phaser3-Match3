@@ -42,29 +42,6 @@ class PlayerInput extends UserComponent {
 
 	private boosterObject?: BoosterBase;
 
-	override start(){
-		// this.PrepareInteractionBox();
-	}
-
-	private PrepareInteractionBox(){
-		//console.log("Prepare Interaction " + this.tileCreator + " " + this.tileSelector);
-		if(!this.tileCreator){
-			return;
-		}
-		//console.log("Prepare Interaction Pass");
-
-		var tiles = this.tileCreator.GetAllTiles();
-		for (var i = 0; i < tiles.length; i++){
-
-			for (var j = 0; j < tiles[i].length; j++){
-				var gameObject = tiles[i][j] as Phaser.GameObjects.Image;
-				var shape = new Phaser.Geom.Circle(49.5, 44, 44);
-
-				gameObject.setInteractive(shape, Phaser.Geom.Circle.Contains);
-			}
-		}
-	}
-
 	// Static Functions
 	static OnPointerDown(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject){
 		return PlayerInput.Instance.OnPointerDown(pointer, gameObject);
@@ -84,19 +61,14 @@ class PlayerInput extends UserComponent {
 
 	// OnAction Functions
 	public OnPointerDown(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject){
-		//console.log("Pointer Down " + this.tileCreator + " " + this.tileSelector);
-		//console.log(!this.tileCreator || !this.tileSelector);
 		if(!this.tileCreator || !this.tileSelector || !this.animationSystem){
 			return;
 		}
 		if(this.animationSystem.IsAnimationRunning()){
 			return;
 		}
-		// console.log("Pointer Down " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
-		//console.log("Pointer Down Pass");
 
 		if(this.interactable && Tiles.getComponent(gameObject)){
-			// console.log("Pointer Down: Tile");
 			this.interactable = false;
 			this.tileInteraction = true;
 
@@ -104,27 +76,20 @@ class PlayerInput extends UserComponent {
 		}
 
 		else if(this.interactable && BoosterBase.getComponent(gameObject)){
-			// console.log("Pointer Down: Booster");
 			this.interactable = false;
 			this.boosterInteraction = true;
 
 			this.boosterObject = BoosterBase.getComponent(gameObject);
 			this.boosterObject.OnStandby();
 		}
-		// console.log("Pointer Down RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
 	}
 
 	public OnPointerOver(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject){
-		//console.log("Pointer Over " + this.tileCreator + " " + this.tileSelector);
-		//console.log(!this.tileCreator || !this.tileSelector);
 		if(!this.tileCreator || !this.tileSelector){
 			return;
 		}
-		// console.log("Pointer Over " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
-		//console.log("Pointer Over Pass");
 
 		if(this.tileInteraction && Tiles.getComponent(gameObject)){
-			// console.log("Pointer Over: Tile");
 			var prevTile = this.tileSelector.GetPrevTile();
 
 			if(prevTile && gameObject == prevTile.GetGameObject()){
@@ -134,20 +99,14 @@ class PlayerInput extends UserComponent {
 				this.tileSelector.SelectTile(Tiles.getComponent(gameObject));
 			}
 		}
-		// console.log("Pointer Over RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
 	}
 
 	public OnPointerUp(pointer?: Phaser.Input.Pointer, gameObject?: Phaser.GameObjects.GameObject){
-		//console.log("Pointer Up " + this.tileCreator + " " + this.tileSelector);
-		//console.log(!this.tileCreator || !this.tileSelector);
 		if(!this.tileCreator || !this.tileSelector){
 			return;
 		}
-		// console.log("Pointer Up " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
-		//console.log("Pointer Up Pass");
 
 		if(this.tileInteraction){
-			// console.log("Pointer Up: Tile");
 			this.tileSelector.ValidateSelection();
 
 			this.interactable = true;
@@ -155,45 +114,32 @@ class PlayerInput extends UserComponent {
 		}
 
 		else if(this.boosterInteraction && this.boosterObject){
-			// console.log("Pointer Up: Booster");
 			this.boosterObject.OnInteract();
-			//this.boosterObject = false;
 
 			this.interactable = true;
 			this.boosterInteraction = false;
 		}
-		// console.log("Pointer Up RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
 	}
 
 	public OnPointerOut(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject){
-		//console.log("Pointer Out");
-		//console.log("Pointer Out " + this.tileCreator + " " + this.tileSelector);
-		//console.log(!this.tileCreator || !this.tileSelector);
 		if(!this.tileCreator || !this.tileSelector){
 			return;
 		}
-		// console.log("Pointer Out " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
-		//console.log("Pointer Out Pass");
 
 		if(this.boosterInteraction && this.boosterObject){
-			// console.log("Pointer Out: Booster");
 			this.boosterObject.OnCancel();
-			//this.boosterObject = false;
 
 			this.interactable = true;
 			this.boosterInteraction = false;
 		}
-		// console.log("Pointer Out RES " + this.interactable + " " + this.tileInteraction + " " + this.boosterInteraction);
 	}
 
 	public SetTileCreator(tileCreator: TileCreator){
 		this.tileCreator = tileCreator;
-		//console.log("Set Tile Creator " + this.tileCreator + " " + this.tileSelector);
 	}
 
 	public SetTileSelector(tileSelector: TileSelector){
 		this.tileSelector = tileSelector;
-		//console.log("Set Tile Selector " + this.tileCreator + " " + this.tileSelector);
 	}
 
 	public SetAnimationSystem(animationSystem: AnimationSystem){

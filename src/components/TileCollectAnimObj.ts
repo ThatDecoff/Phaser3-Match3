@@ -28,13 +28,6 @@ class TileCollectAnimObj extends BaseAnimObj {
         
         this.speed = lenDistance;
         this.scaleSpeed = gameObject.scaleX * 0.4;
-
-        console.log("TileMoveAnimObj");
-        console.log("distance " + distance.x + " " + distance.y);
-        console.log("lenDistance " + lenDistance);
-        console.log("moveDir " + this.moveDir.x + " " + this.moveDir.y);
-        console.log("speed " + this.speed);
-        console.log("target " + this.target.x + " " + this.target.y);
     }
 
     private gameObject: Phaser.GameObjects.Container;
@@ -98,7 +91,6 @@ class TileCollectAnimObj extends BaseAnimObj {
     }
 
     override OnFinish(){
-        // this.tileCreator.SetTileVisibility(this.tilePos, true);
         this.tileSelector.DecrementCounter();
         this.gameObject.destroy();
     }
@@ -113,22 +105,14 @@ class TileCollectAnimObj extends BaseAnimObj {
             Math.abs(this.target.y - this.gameObject.y);
         var moveDist = Math.abs(movement.x) +
             Math.abs(movement.y);
-
-        if(this.print < 2){
-            console.log("Phase1 " + targetDist + " " + moveDist);
-            console.log("target " + this.target.x + " " + this.target.y);
-            console.log("movement " + movement.x + " " + movement.y);
-        }
         
         if(moveDist < targetDist){
-            // console.log("Phase1Move " + this.startPos.x + " " + this.startPos.y);
             this.gameObject.setPosition(movement.x + this.gameObject.x,
                 movement.y + this.gameObject.y);
             this.gameObject.setScale(scale.x + this.gameObject.scaleX,
                 scale.y + this.gameObject.scaleY);
         }
         else{
-            // console.log("Phase1Snap " + this.startPos.x + " " + this.startPos.y);
             this.gameObject.setPosition(this.target.x, this.target.y);
             this.gameObject.setScale(scale.x + this.gameObject.scaleX,
                 scale.y + this.gameObject.scaleY);
@@ -157,18 +141,13 @@ class TileCollectAnimObj extends BaseAnimObj {
         var moveDist = Math.abs(movement.x) +
             Math.abs(movement.y);
         
-        // console.log("MoveSnap " + targetDist + " " + moveDist);
-        // console.log("Phase2 " + targetDist + " " + moveDist);
-        
         if(moveDist < targetDist){
-            // console.log("Phase2Move " + this.startPos.x + " " + this.startPos.y);
             this.gameObject.setPosition(movement.x + this.gameObject.x,
                 movement.y + this.gameObject.y);
             this.gameObject.setScale(scale.x + this.gameObject.scaleX,
                 scale.y + this.gameObject.scaleY);
         }
         else{
-            // console.log("Phase2Snap " + this.startPos.x + " " + this.startPos.y);
             this.gameObject.setPosition(this.endPos.x, this.endPos.y);
             this.OnFinish();
             this.isFinished = true;

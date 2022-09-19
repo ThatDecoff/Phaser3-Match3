@@ -30,25 +30,18 @@ class BoosterBase extends UserComponent {
 	protected SetInteractive(){
 		var shape = new Phaser.Geom.Circle(75, 60, 37.5);
 		this.gameObject.setInteractive(shape, Phaser.Geom.Circle.Contains);
-
-		// var graphics = this.scene.add.graphics({ x: this.gameObject.x - this.gameObject.displayOriginX, y: this.gameObject.y - this.gameObject.displayOriginY });
-    	// graphics.lineStyle(2, 0x00aa00);
-		// graphics.strokeCircle(75, 60, 37.5);
 	}
 
 	public OnStandby(message?: any){
 		// Override
-		//console.log("BoosterBase: Standby");
 	}
 
 	public OnInteract(message?: any){
 		// Override
-		//console.log("BoosterBase: Interact");
 	}
 
 	public OnCancel(message?: any){
 		// Override
-		//console.log("BoosterBase: Cancel");
 	}
 
 	static shuffle<T>(array: T[]){
