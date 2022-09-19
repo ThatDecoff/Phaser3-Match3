@@ -335,7 +335,7 @@ class HintBooster extends BoosterBase {
             for (var i = 0; i < result.length; i++) {
                 var resTileScript = this.tileCreator.GetTileScript(result[i]);
                 if (resTileScript) {
-                    this.tileSelector.SelectTile(resTileScript);
+                    this.tileSelector.SelectTile(resTileScript, false);
                 }
             }
             this.tileSelector.ValidateSelection();
@@ -444,6 +444,7 @@ class LevelSystem extends UserComponent {
     gameObject;
     /* START-USER-CODE */
     animationSystem;
+    soundSystem;
     hpBarText;
     levelText;
     hpBarImage;
@@ -486,6 +487,9 @@ class LevelSystem extends UserComponent {
             this.currentLevel += 1;
             this.maxHp = LevelSystem.LevelFunction(this.currentLevel);
             this.currentHp = this.maxHp;
+            if (this.soundSystem) {
+                this.soundSystem.PlaySound("level_up");
+            }
             this.HpBarAnimation(0);
             this.UpdateTexts();
         }
@@ -523,6 +527,9 @@ class LevelSystem extends UserComponent {
     }
     SetAnimationSystem(animationSystem) {
         this.animationSystem = animationSystem;
+    }
+    SetSoundSystem(soundSystem) {
+        this.soundSystem = soundSystem;
     }
 }
 /* END OF COMPILED CODE */
@@ -837,13 +844,29 @@ class SoundSystem extends UserComponent {
         this.gameObject = gameObject;
         gameObject["__SoundSystem"] = this;
         /* START-USER-CTR-CODE */
-        // Write your code here.
+        var mainLoop = this.scene.sound.add("main_loop", { loop: true });
+        var tileSelect = this.scene.sound.add("tile_select", { volume: 0.2 });
+        var tileCollect = this.scene.sound.add("tile_collect", { volume: 0.2 });
+        var tileDown = this.scene.sound.add("tile_down", { volume: 0.2 });
+        var levelUp = this.scene.sound.add("level_up", { volume: 0.2 });
+        this.soundCollection["main_loop"] = mainLoop;
+        this.soundCollection["tile_select"] = tileSelect;
+        this.soundCollection["tile_collect"] = tileCollect;
+        this.soundCollection["tile_down"] = tileDown;
+        this.soundCollection["level_up"] = levelUp;
         /* END-USER-CTR-CODE */
     }
     static getComponent(gameObject) {
         return gameObject["__SoundSystem"];
     }
     gameObject;
+    /* START-USER-CODE */
+    soundCollection = {};
+    PlaySound(key) {
+        if (this.soundCollection[key]) {
+            this.soundCollection[key].play();
+        }
+    }
 }
 /* END OF COMPILED CODE */
 // You can write more code here
@@ -1005,6 +1028,7 @@ class TileCreator extends UserComponent {
     gameObject;
     /* START-USER-CODE */
     animationSystem;
+    soundSystem;
     container;
     // Hardcoded for now
     TileWidth = 49.5;
@@ -1084,6 +1108,10 @@ class TileCreator extends UserComponent {
                 tile.SetImage(tileImages[i][j]);
             }
         }
+        // Tile Down SFX
+        if (this.soundSystem) {
+            this.soundSystem.PlaySound("tile_down");
+        }
         // Tile Down Animation
         for (var i = 0; i < tilePrev.length; i++) {
             for (var j = 0; j < tilePrev[i].length; j++) {
@@ -1119,6 +1147,9 @@ class TileCreator extends UserComponent {
         this.animationSystem.AddAnimation(animation);
     }
     SwapTiles(tileList) {
+        if (this.soundSystem) {
+            this.soundSystem.PlaySound("tile_collect");
+        }
         for (var i = 0; i < tileList.length; i++) {
             this.SwapTile(tileList[i][0], tileList[i][1]);
         }
@@ -1272,6 +1303,9 @@ class TileCreator extends UserComponent {
     SetAnimationSystem(animationSystem) {
         this.animationSystem = animationSystem;
     }
+    SetSoundSystem(soundSystem) {
+        this.soundSystem = soundSystem;
+    }
 }
 /* END OF COMPILED CODE */
 // You can write more code here
@@ -1388,13 +1422,14 @@ class TileSelector extends UserComponent {
     tileCreator;
     levelSystem;
     animationSystem;
+    soundSystem;
     connectors = [];
     tileList = [];
     tileCounter = 0;
     static ScoreFunction = function (value) {
         return 10 * Math.pow(2, value);
     };
-    SelectTile(tile) {
+    SelectTile(tile, playerInput = true) {
         //console.log("Select Tile");
         if (tile.IsSelected()) {
             return;
@@ -1410,7 +1445,9 @@ class TileSelector extends UserComponent {
         if (this.tileList.length > 0 && !this.tileCreator.CheckNeighbor(tile, prevTile)) {
             return;
         }
-        // console.log("Select Tile");
+        if (playerInput && this.soundSystem) {
+            this.soundSystem.PlaySound("tile_select");
+        }
         tile.ToggleSelected(true);
         var gameObject = tile.GetGameObject();
         var ellipse = this.scene.add.ellipse(gameObject.x, gameObject.y, 10, 10);
@@ -1438,7 +1475,7 @@ class TileSelector extends UserComponent {
         this.UpdateTileEffects();
         this.UpdateScoreText();
     }
-    DeselectTile() {
+    DeselectTile(playerInput = true) {
         if (this.tileList.length > 0) {
             // console.log("Deselect Tile");
             var tile = this.tileList.pop();
@@ -1451,6 +1488,9 @@ class TileSelector extends UserComponent {
                 prevConnector.edge.setSize(0, 4);
                 prevConnector.edge.setAngle(0);
             }
+            if (playerInput && this.soundSystem) {
+                this.soundSystem.PlaySound("tile_select");
+            }
             tile.ToggleSelected(false);
             connector.vertice.destroy();
             connector.edge.destroy();
@@ -1459,10 +1499,10 @@ class TileSelector extends UserComponent {
             this.UpdateScoreText();
         }
     }
-    DeselectAllTile() {
+    DeselectAllTile(playerInput = true) {
         // console.log("Deselect All Tile");
         while (this.tileList.length > 0) {
-            this.DeselectTile();
+            this.DeselectTile(playerInput);
         }
     }
     ValidateSelection() {
@@ -1472,6 +1512,9 @@ class TileSelector extends UserComponent {
         if (this.tileList.length >= 3) {
             // console.log("Validate: True");
             this.tileCounter = this.tileList.length;
+            if (this.soundSystem) {
+                this.soundSystem.PlaySound("tile_collect");
+            }
             if (this.animationSystem) {
                 for (var i = 0; i < this.tileList.length; i++) {
                     var tile = this.tileList[i];
@@ -1519,12 +1562,15 @@ class TileSelector extends UserComponent {
         }
         else {
             // console.log("Validate: False");
-            this.DeselectAllTile();
+            this.DeselectAllTile(false);
         }
     }
     DecrementCounter() {
         this.tileCounter -= 1;
         if (this.tileCounter == 0) {
+            if (this.soundSystem) {
+                this.soundSystem.PlaySound("tile_collect");
+            }
             this.ValidationStart();
         }
     }
@@ -1537,7 +1583,7 @@ class TileSelector extends UserComponent {
             tileCoords.push(this.tileList[i].GetCoord());
         }
         var tileLength = this.tileList.length;
-        this.DeselectAllTile();
+        this.DeselectAllTile(false);
         this.tileCreator.ConsumeTile(tileCoords);
         this.levelSystem.SetHealth(-TileSelector.ScoreFunction(tileLength));
     }
@@ -1596,6 +1642,9 @@ class TileSelector extends UserComponent {
     }
     SetAnimationSystem(animationSystem) {
         this.animationSystem = animationSystem;
+    }
+    SetSoundSystem(soundSystem) {
+        this.soundSystem = soundSystem;
     }
 }
 /// <reference path="./UserComponent.ts"/>
@@ -1741,11 +1790,14 @@ class MainScene extends Phaser.Scene {
         new TileSelector(gameManager);
         new LevelSystem(gameManager);
         new AnimationSystem(gameManager);
+        new SoundSystem(gameManager);
         new PlayerInput(gameManager);
         this.GameManagerSetup(gameManager);
         this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
         this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
-        this.AnimationSetup();
+        this.AnimationSetup(gameManager);
+        this.SoundSetup(gameManager);
+        this.SpritesheetSetup();
         this.InputSetup(gameManager);
         this.events.emit("scene-awake");
     }
@@ -1753,25 +1805,20 @@ class MainScene extends Phaser.Scene {
     // this.GameManagerSetup(gameManager);
     // this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
     // this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
-    // this.AnimationSetup();
+    // this.AnimationSetup(gameManager);
+    // this.SoundSetup(gameManager);
+    // this.SpritesheetSetup();
     // this.InputSetup(gameManager);
     // this.PrintAll();
     GameManagerSetup(gameManager) {
-        //this.children.moveTo(gameManager, 0);
         var tileCreator = TileCreator.getComponent(gameManager);
         var tileSelector = TileSelector.getComponent(gameManager);
         var levelSystem = LevelSystem.getComponent(gameManager);
-        var animationSystem = AnimationSystem.getComponent(gameManager);
         var playerInput = PlayerInput.getComponent(gameManager);
-        //console.log("Game Manager Setup " + tileCreator + " " + tileSelector + " " + playerInput);
-        tileCreator.SetAnimationSystem(animationSystem);
         tileSelector.SetTileCreator(tileCreator);
         tileSelector.SetLevelSystem(levelSystem);
-        tileSelector.SetAnimationSystem(animationSystem);
         playerInput.SetTileCreator(tileCreator);
         playerInput.SetTileSelector(tileSelector);
-        playerInput.SetAnimationSystem(animationSystem);
-        levelSystem.SetAnimationSystem(animationSystem);
     }
     LevelSystemSetup(gameManager, hpBarText, levelText, hpBarImage) {
         var levelSystem = LevelSystem.getComponent(gameManager);
@@ -1789,7 +1836,28 @@ class MainScene extends Phaser.Scene {
         shuffleBoosterScr.SetTileCreator(tileCreator);
         shuffleBoosterScr.SetTileSelector(tileSelector);
     }
-    AnimationSetup() {
+    AnimationSetup(gameManager) {
+        var tileCreator = TileCreator.getComponent(gameManager);
+        var tileSelector = TileSelector.getComponent(gameManager);
+        var levelSystem = LevelSystem.getComponent(gameManager);
+        var animationSystem = AnimationSystem.getComponent(gameManager);
+        var playerInput = PlayerInput.getComponent(gameManager);
+        tileCreator.SetAnimationSystem(animationSystem);
+        tileSelector.SetAnimationSystem(animationSystem);
+        playerInput.SetAnimationSystem(animationSystem);
+        levelSystem.SetAnimationSystem(animationSystem);
+    }
+    SoundSetup(gameManager) {
+        var tileCreator = TileCreator.getComponent(gameManager);
+        var tileSelector = TileSelector.getComponent(gameManager);
+        var levelSystem = LevelSystem.getComponent(gameManager);
+        var soundSystem = SoundSystem.getComponent(gameManager);
+        tileCreator.SetSoundSystem(soundSystem);
+        tileSelector.SetSoundSystem(soundSystem);
+        levelSystem.SetSoundSystem(soundSystem);
+        soundSystem.PlaySound("main_loop");
+    }
+    SpritesheetSetup() {
         this.anims.create({
             key: "TileFx",
             frames: "tiles_fx",

@@ -154,6 +154,7 @@
                 "ScoreSystem",
                 "LevelSystem",
                 "AnimationSystem",
+                "SoundSystem",
                 "PlayerInput"
             ],
             "texture": {},

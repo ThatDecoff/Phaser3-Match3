@@ -31,6 +31,7 @@ class LevelSystem extends UserComponent {
 
 	/* START-USER-CODE */
 	private animationSystem?: AnimationSystem;
+	private soundSystem?: SoundSystem;
 
 	private hpBarText?: Phaser.GameObjects.Text;
 	private levelText?: Phaser.GameObjects.Text;
@@ -84,8 +85,11 @@ class LevelSystem extends UserComponent {
 			this.maxHp = LevelSystem.LevelFunction(this.currentLevel);
 			this.currentHp = this.maxHp;
 
-			this.HpBarAnimation(0);
+			if(this.soundSystem){
+				this.soundSystem.PlaySound("level_up");
+			}
 
+			this.HpBarAnimation(0);
 			this.UpdateTexts();
 		}
 	}
@@ -135,6 +139,10 @@ class LevelSystem extends UserComponent {
 
 	public SetAnimationSystem(animationSystem: AnimationSystem){
 		this.animationSystem = animationSystem;
+	}
+
+	public SetSoundSystem(soundSystem: SoundSystem){
+		this.soundSystem = soundSystem;
 	}
 
 	/* END-USER-CODE */

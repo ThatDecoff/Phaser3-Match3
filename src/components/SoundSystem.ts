@@ -16,7 +16,18 @@ class SoundSystem extends UserComponent {
 		(gameObject as any)["__SoundSystem"] = this;
 
 		/* START-USER-CTR-CODE */
-		// Write your code here.
+		var mainLoop = this.scene.sound.add("main_loop", {loop: true});
+
+		var tileSelect = this.scene.sound.add("tile_select", {volume: 0.2});
+		var tileCollect = this.scene.sound.add("tile_collect", {volume: 0.2});
+		var tileDown = this.scene.sound.add("tile_down", {volume: 0.2});
+		var levelUp = this.scene.sound.add("level_up", {volume: 0.2});
+
+		this.soundCollection["main_loop"] = mainLoop;
+		this.soundCollection["tile_select"] = tileSelect;
+		this.soundCollection["tile_collect"] = tileCollect;
+		this.soundCollection["tile_down"] = tileDown;
+		this.soundCollection["level_up"] = levelUp;
 		/* END-USER-CTR-CODE */
 	}
 
@@ -27,9 +38,13 @@ class SoundSystem extends UserComponent {
 	private gameObject: Phaser.GameObjects.Image;
 
 	/* START-USER-CODE */
+	private soundCollection: { [key: string] : Phaser.Sound.BaseSound } = {};
 
-	// Write your code here.
-
+	public PlaySound(key: string){
+		if(this.soundCollection[key]){
+			this.soundCollection[key].play();
+		}
+	}
 	/* END-USER-CODE */
 }
 

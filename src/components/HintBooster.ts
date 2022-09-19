@@ -148,7 +148,7 @@ class HintBooster extends BoosterBase {
 			for(var i = 0; i < result.length; i++){
 				var resTileScript = this.tileCreator.GetTileScript(result[i]);
 				if(resTileScript){
-					this.tileSelector.SelectTile(resTileScript);
+					this.tileSelector.SelectTile(resTileScript, false);
 				}
 			}
 			this.tileSelector.ValidateSelection();

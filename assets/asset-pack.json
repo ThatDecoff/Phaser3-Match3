@@ -47,6 +47,20 @@
                 "key": "hpbar_frame"
             },
             {
+                "url": [
+                    "assets/sounds/level_up.mp3"
+                ],
+                "type": "audio",
+                "key": "level_up"
+            },
+            {
+                "url": [
+                    "assets/sounds/main_loop.wav"
+                ],
+                "type": "audio",
+                "key": "main_loop"
+            },
+            {
                 "url": "assets/tiles/PURPLE_1.png",
                 "type": "image",
                 "key": "PURPLE_1"
@@ -95,6 +109,27 @@
                 "url": "assets/booster/SHUFFLE_on.png",
                 "type": "image",
                 "key": "SHUFFLE_on"
+            },
+            {
+                "url": [
+                    "assets/sounds/tile_collect.mp3"
+                ],
+                "type": "audio",
+                "key": "tile_collect"
+            },
+            {
+                "url": [
+                    "assets/sounds/tile_down.mp3"
+                ],
+                "type": "audio",
+                "key": "tile_down"
+            },
+            {
+                "url": [
+                    "assets/sounds/tile_select.mp3"
+                ],
+                "type": "audio",
+                "key": "tile_select"
             },
             {
                 "url": "assets/tiles_fx/tiles_fx.png",

@@ -1,54 +1,19 @@
-# Basic TypeScript project template
+# Phaser 3 - Match 3
 
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/PhaserEditor2D/starter-template-basic-typescript)
+Demo game of match 3, made using Phaser 3 game engine.
 
-This is a Phaser Editor 2D v3 project template.
+Based on this Match 3 Demo ([link](https://match-3.vercel.app/)).
 
-## Configuration
+## Acknowledgements
 
-* It includes the latest Phaser v3 runtime as a node package.
-* It is coded in TypeScript. The `tsc` is included as a node package.
-* It includes a VS Code project configuration (`jsconfig.json` file).
+### Sprites
 
-## Compiles the source code
+All sprites were taken from Match 3 Demo ([link](https://match-3.vercel.app/)).
 
-This project is based on TypeScript so for getting the game running you need to compile the TypeScript files:
+### Sounds
 
-```bash
-$ npm run build
-```
+main bgm loop : idle - phazeblaze
 
-It outputs the JavaScript code into the `game.js` file.
+Main bgm was taken from my previous work, Pandemic of Forgotten Virus ([link](https://eaglescommander.itch.io/pandemic-of-the-forgotten-virus)).
 
-Often, you would like to run the TypeScript compiler in watch mode:
-
-```bash
-$ npm run watch
-```
-
-## Run the editor
-
-* If you have NodeJS installed, you can run the editor using the `editor` NPM script, defined in the `package.json` file:
-
-    ```bash
-    $ npm install
-    $ npm run editor
-    ```
-
-* If you are in a remote environment (like the Gitpod.io IDE), then run the editor like this:
-
-    ```bash
-    $ npm run editor-remote
-    ```
-
-* If you want to see all the editor options, run:
-
-    ```bash
-    $ npx phasereditor2d-launcher -help
-    ```
-
-* If Phaser Editor 2D Core is globally installed, you can run:
-
-    ```bash
-    $ PhaserEditor2D -project .
-    ```
+All sfx was taken from Match 3 Demo ([link](https://match-3.vercel.app/)).

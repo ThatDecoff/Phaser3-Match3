@@ -45,6 +45,7 @@ class TileSelector extends UserComponent {
 	private tileCreator?: TileCreator;
 	private levelSystem?: LevelSystem;
 	private animationSystem?: AnimationSystem;
+	private soundSystem?: SoundSystem;
 
 	private connectors: TileConnector[] = [];
 	private tileList: Tiles[] = [];
@@ -55,7 +56,7 @@ class TileSelector extends UserComponent {
 		return 10 * Math.pow(2, value);
 	};
 
-	public SelectTile(tile: Tiles){
+	public SelectTile(tile: Tiles, playerInput: boolean = true){
 		//console.log("Select Tile");
 		if(tile.IsSelected()){
 			return;
@@ -73,7 +74,9 @@ class TileSelector extends UserComponent {
 			return;
 		}
 
-		// console.log("Select Tile");
+		if(playerInput && this.soundSystem){
+			this.soundSystem.PlaySound("tile_select");
+		}
 
 		tile.ToggleSelected(true);
 
@@ -109,7 +112,7 @@ class TileSelector extends UserComponent {
 		this.UpdateScoreText();
 	}
 
-	public DeselectTile(){
+	public DeselectTile(playerInput: boolean = true){
 		if(this.tileList.length > 0){
 			// console.log("Deselect Tile");
 			var tile = this.tileList.pop();
@@ -125,6 +128,10 @@ class TileSelector extends UserComponent {
 				prevConnector.edge.setAngle(0);
 			}
 
+			if(playerInput && this.soundSystem){
+				this.soundSystem.PlaySound("tile_select");
+			}
+
 			tile.ToggleSelected(false);
 			connector.vertice.destroy();
 			connector.edge.destroy();
@@ -135,10 +142,10 @@ class TileSelector extends UserComponent {
 		}
 	}
 
-	public DeselectAllTile(){
+	public DeselectAllTile(playerInput: boolean = true){
 		// console.log("Deselect All Tile");
 		while(this.tileList.length > 0){
-			this.DeselectTile();
+			this.DeselectTile(playerInput);
 		}
 	}
 
@@ -150,6 +157,10 @@ class TileSelector extends UserComponent {
 		if(this.tileList.length >= 3){
 			// console.log("Validate: True");
 			this.tileCounter = this.tileList.length;
+
+			if(this.soundSystem){
+				this.soundSystem.PlaySound("tile_collect");
+			}
 
 			if(this.animationSystem){
 				for (var i = 0; i < this.tileList.length; i++){
@@ -214,13 +225,17 @@ class TileSelector extends UserComponent {
 		}
 		else{
 			// console.log("Validate: False");
-			this.DeselectAllTile();
+			this.DeselectAllTile(false);
 		}
 	}
 
 	public DecrementCounter(){
 		this.tileCounter -= 1;
 		if(this.tileCounter == 0){
+			if(this.soundSystem){
+				this.soundSystem.PlaySound("tile_collect");
+			}
+
 			this.ValidationStart();
 		}
 	}
@@ -236,7 +251,7 @@ class TileSelector extends UserComponent {
 		}
 
 		var tileLength = this.tileList.length;
-		this.DeselectAllTile();
+		this.DeselectAllTile(false);
 		this.tileCreator.ConsumeTile(tileCoords);
 		this.levelSystem.SetHealth(-TileSelector.ScoreFunction(tileLength));
 	}
@@ -305,6 +320,10 @@ class TileSelector extends UserComponent {
 
 	public SetAnimationSystem(animationSystem: AnimationSystem){
 		this.animationSystem = animationSystem;
+	}
+
+	public SetSoundSystem(soundSystem: SoundSystem){
+		this.soundSystem = soundSystem;
 	}
 
 	/* END-USER-CODE */

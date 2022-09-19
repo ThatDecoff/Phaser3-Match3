@@ -98,12 +98,15 @@ class MainScene extends Phaser.Scene {
 		new TileSelector(gameManager);
 		new LevelSystem(gameManager);
 		new AnimationSystem(gameManager);
+		new SoundSystem(gameManager);
 		new PlayerInput(gameManager);
 
 		this.GameManagerSetup(gameManager);
 		this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
 		this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
-		this.AnimationSetup();
+		this.AnimationSetup(gameManager);
+		this.SoundSetup(gameManager);
+		this.SpritesheetSetup();
 		this.InputSetup(gameManager);
 		this.events.emit("scene-awake");
 	}
@@ -113,31 +116,23 @@ class MainScene extends Phaser.Scene {
 		// this.GameManagerSetup(gameManager);
 		// this.LevelSystemSetup(gameManager, hpbar_text, level_text, hpbar_fill);
 		// this.BoosterSetup(gameManager, hint_booster, shuffle_booster);
-		// this.AnimationSetup();
+		// this.AnimationSetup(gameManager);
+		// this.SoundSetup(gameManager);
+		// this.SpritesheetSetup();
 		// this.InputSetup(gameManager);
 		// this.PrintAll();
 
 	private GameManagerSetup(gameManager: Phaser.GameObjects.Image){
-		//this.children.moveTo(gameManager, 0);
-
 		var tileCreator = TileCreator.getComponent(gameManager);
 		var tileSelector = TileSelector.getComponent(gameManager);
 		var levelSystem = LevelSystem.getComponent(gameManager);
-		var animationSystem = AnimationSystem.getComponent(gameManager);
 		var playerInput = PlayerInput.getComponent(gameManager);
-
-		//console.log("Game Manager Setup " + tileCreator + " " + tileSelector + " " + playerInput);
-		tileCreator.SetAnimationSystem(animationSystem);
 
 		tileSelector.SetTileCreator(tileCreator);
 		tileSelector.SetLevelSystem(levelSystem);
-		tileSelector.SetAnimationSystem(animationSystem);
 
 		playerInput.SetTileCreator(tileCreator);
 		playerInput.SetTileSelector(tileSelector);
-		playerInput.SetAnimationSystem(animationSystem);
-
-		levelSystem.SetAnimationSystem(animationSystem);
 	}
 
 	private LevelSystemSetup(
@@ -171,7 +166,33 @@ class MainScene extends Phaser.Scene {
 		shuffleBoosterScr.SetTileSelector(tileSelector);
 	}
 
-	private AnimationSetup(){
+	private AnimationSetup(gameManager: Phaser.GameObjects.Image){
+		var tileCreator = TileCreator.getComponent(gameManager);
+		var tileSelector = TileSelector.getComponent(gameManager);
+		var levelSystem = LevelSystem.getComponent(gameManager);
+		var animationSystem = AnimationSystem.getComponent(gameManager);
+		var playerInput = PlayerInput.getComponent(gameManager);
+
+		tileCreator.SetAnimationSystem(animationSystem);
+		tileSelector.SetAnimationSystem(animationSystem);
+		playerInput.SetAnimationSystem(animationSystem);
+		levelSystem.SetAnimationSystem(animationSystem);
+	}
+
+	private SoundSetup(gameManager: Phaser.GameObjects.Image){
+		var tileCreator = TileCreator.getComponent(gameManager);
+		var tileSelector = TileSelector.getComponent(gameManager);
+		var levelSystem = LevelSystem.getComponent(gameManager);
+		var soundSystem = SoundSystem.getComponent(gameManager);
+
+		tileCreator.SetSoundSystem(soundSystem);
+		tileSelector.SetSoundSystem(soundSystem);
+		levelSystem.SetSoundSystem(soundSystem);
+
+		soundSystem.PlaySound("main_loop");
+	}
+
+	private SpritesheetSetup(){
 		this.anims.create({
 			key: "TileFx",
 			frames: "tiles_fx",

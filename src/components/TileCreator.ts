@@ -29,6 +29,8 @@ class TileCreator extends UserComponent {
 
 	/* START-USER-CODE */
 	private animationSystem?: AnimationSystem;
+	private soundSystem?: SoundSystem;
+
 	private container: Phaser.GameObjects.Container;
 
 	// Hardcoded for now
@@ -128,6 +130,11 @@ class TileCreator extends UserComponent {
 			}
 		}
 
+		// Tile Down SFX
+		if(this.soundSystem){
+			this.soundSystem.PlaySound("tile_down");
+		}
+
 		// Tile Down Animation
 		for (var i = 0; i < tilePrev.length; i++){
 			for (var j = 0; j < tilePrev[i].length; j++){
@@ -186,6 +193,10 @@ class TileCreator extends UserComponent {
 	}
 
 	public SwapTiles(tileList: [Vector2, Vector2][]){
+		if(this.soundSystem){
+			this.soundSystem.PlaySound("tile_collect");
+		}
+
 		for(var i = 0; i < tileList.length; i++){
 			this.SwapTile(tileList[i][0], tileList[i][1]);
 		}
@@ -380,6 +391,10 @@ class TileCreator extends UserComponent {
 
 	public SetAnimationSystem(animationSystem: AnimationSystem){
 		this.animationSystem = animationSystem;
+	}
+
+	public SetSoundSystem(soundSystem: SoundSystem){
+		this.soundSystem = soundSystem;
 	}
 
 	/* END-USER-CODE */
